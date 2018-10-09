@@ -102,7 +102,8 @@ export class ScenarioComponent implements OnInit, OnChanges, OnDestroy {
                 const hostEl = document.querySelector('playground-host');
                 if (!hostEl) {
                     const compEl = document.createElement('playground-host');
-                    document.body.appendChild(compEl);
+                    // necessary change so that playground-host is a part of the ap-root and can be added to flexbox
+                    document.body.children[0].appendChild(compEl);
                 }
                 app.bootstrap(hostComp);
             }
