@@ -1,8 +1,9 @@
+<!--
 <div class="shield" *ngIf="commandBarActive" (click)="toggleCommandBar()"></div>
-<div class="command-bar" *ngIf="filteredSandboxMenuItems"
+-->
+<div class="command-bar command-bar--open" *ngIf="filteredSandboxMenuItems"
      (keydown.control)="onCommandBarStartPreview($event)"
      (keyup.control)="onCommandBarStopPreview()"
-     [class.command-bar--open]="commandBarActive"
      [class.command-bar--preview]="commandBarPreview">
     <input
         class="command-bar__filter"
@@ -11,8 +12,6 @@
         placeholder="search..."
         [formControl]="filter"
         #filterElement
-        [apFocus]="commandBarActive"
-        (keyup.Esc)="commandBarActive = false"
         (keydown.arrowup)="onFilterBoxArrowUp($event)"
         (keydown.arrowdown)="onFilterBoxArrowDown($event)"
         (keydown.control.arrowup)="onFilterBoxArrowUp($event, true)"
@@ -68,6 +67,7 @@
             <p *ngIf="totalSandboxes === 0">
                 Get started - create your first sandbox! <a href="http://www.angularplayground.it/docs/how-to/sandboxing-components" target="_blank">Click here</a>.
             </p>
+            <!--
             <div class="content__shortcuts">
                 <div class="content__shortcut" *ngFor="let shortcut of shortcuts">
                     <div class="content__shortcut-label">
@@ -83,6 +83,7 @@
                     </div>
                 </div>
             </div>
+        -->
         </div>
     </div>
     <ng-container *ngIf="selectedSandboxAndScenarioKeys.sandboxKey">
