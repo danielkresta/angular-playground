@@ -83,6 +83,30 @@
       padding: 0;
     }
 
+    /* Categories */
+    .command-bar__categories {
+        margin-top: 9px;
+    }
+
+    .command-bar__category {
+        padding: 5px;
+    }
+
+    .command-bar__category__title {
+        color: rgba(255, 255, 255, .8);
+        font-family: Consolas, monospace;
+        font-size: 16px;
+        margin: 0;
+    }
+
+    .command-bar__category__title:hover,
+    .command-bar__category__title:active,
+    .command-bar__category__title:focus {
+      opacity: 0.8;
+      outline-style: none;
+      cursor: pointer;
+    }
+
     /* Sandboxes */
     .command-bar__sandboxes {
       border-top: solid 1px rgba(255, 255, 255, .1);

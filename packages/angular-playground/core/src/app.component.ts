@@ -21,6 +21,9 @@ export class AppComponent {
     commandBarActive = false;
     commandBarPreview = false;
     totalSandboxes: number;
+    sandboxMenuItems: SandboxMenuItem[];
+    uniqueLabels: string[] = [];
+    categoriesVisible: boolean[] = [];
     filteredSandboxMenuItems: SandboxMenuItem[];
     selectedSandboxAndScenarioKeys: SelectedSandboxAndScenarioKeys = { sandboxKey: null, scenarioKey: null };
     filter = new FormControl();
@@ -35,7 +38,7 @@ export class AppComponent {
     }
 
     ngOnInit() {
-        const sandboxMenuItems = SandboxLoader.getSandboxMenuItems();
+        this.sandboxMenuItems = SandboxLoader.getSandboxMenuItems();
 
         this.middleware
             .subscribe(middleware => this.activeMiddleware = middleware);
@@ -66,9 +69,10 @@ export class AppComponent {
                 this.toggleCommandBar();
             });
 
+            this.uniqueLabels = this.findUniqueLabels( this.sandboxMenuItems );
             let filterValue = this.stateService.getFilter();
-            this.totalSandboxes = sandboxMenuItems.length;
-            this.filteredSandboxMenuItems = this.filterSandboxes(sandboxMenuItems, filterValue);
+            this.totalSandboxes = this.sandboxMenuItems.length;
+            this.filteredSandboxMenuItems = this.filterSandboxes(this.sandboxMenuItems, filterValue);
             this.filter.setValue(filterValue);
             this.filter.valueChanges.pipe
             (
@@ -77,7 +81,7 @@ export class AppComponent {
             )
             .subscribe(value => {
                 this.stateService.setFilter(value);
-                this.filteredSandboxMenuItems = this.filterSandboxes(sandboxMenuItems, value);
+                this.filteredSandboxMenuItems = this.filterSandboxes(this.sandboxMenuItems, value);
                 if (!value) {
                     this.selectScenario(null, null);
                 }
@@ -186,6 +190,10 @@ export class AppComponent {
         this.commandBarActive = !this.commandBarActive;
     }
 
+    onCategoryClick( category: string ) {
+        this.categoriesVisible[category]  = !this.categoriesVisible[category];
+    }
+
     private blockEvent(e: KeyboardEvent) {
         e.preventDefault();
         e.stopPropagation();
@@ -252,6 +260,17 @@ export class AppComponent {
             elementRef.nativeElement.focus();
             return elementRef;
         }
+    }
+
+    private findUniqueLabels( sandboxMenuItems: SandboxMenuItem[] ): string[] {
+        const uniqueLabels: string[] = sandboxMenuItems.reduce( (result, item ) => {
+            item.label = item.label || 'Default';
+            if (result.indexOf(item.label) === -1) {
+                result.push(item.label)
+            }
+            return result;
+        }, []);
+        return uniqueLabels;
     }
 
     private filterSandboxes(sandboxMenuItems: SandboxMenuItem[], filter: string) {
