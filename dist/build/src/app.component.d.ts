@@ -7,6 +7,10 @@ import { UrlService } from './shared/url.service';
 import { LevenshteinDistance } from './shared/levenshtein-distance';
 import { Middleware } from '../lib/middlewares';
 import { Observable } from 'rxjs';
+export interface UniqueGroups {
+    uniqueGroups: string[];
+    groupItems: any[][];
+}
 export declare class AppComponent {
     private stateService;
     private urlService;
@@ -28,6 +32,9 @@ export declare class AppComponent {
         description: string;
     }[];
     activeMiddleware: Middleware;
+    groupsVisible: boolean[];
+    uniqueGroups: UniqueGroups[];
+    scenariosVisible: any[];
     constructor(stateService: StateService, urlService: UrlService, eventManager: EventManager, levenshteinDistance: LevenshteinDistance, middleware: Observable<Middleware>);
     ngOnInit(): void;
     onFilterBoxArrowDown(event: any, switchToScenario?: boolean): void;
@@ -42,6 +49,8 @@ export declare class AppComponent {
     isSelected(sandbox: any, scenario: any): boolean;
     toggleCommandBar(): void;
     onCategoryClick(category: string): void;
+    onSandboxHeaderClick(index: number): void;
+    onGroupClick(menuItemIndex: any, groupIndex: any): void;
     private blockEvent;
     private showScenario;
     private findCurrentScenarioIndex;
@@ -49,6 +58,7 @@ export declare class AppComponent {
     private goDown;
     private focusScenarioLinkElement;
     private findUniqueLabels;
+    private findUniqueGroups;
     private filterSandboxes;
     private selectScenario;
     private getShortcuts;
