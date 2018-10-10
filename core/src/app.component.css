@@ -85,23 +85,43 @@
 
     /* Categories */
     .command-bar__categories {
-        margin-top: 9px;
+        overflow: auto;
+    }
+
+    .command-bar__categories::-webkit-scrollbar {
+        background-color: transparent;
+        width: 6px;
+    }
+  
+      .command-bar__categories::-webkit-scrollbar-track {
+        border-left: solid 1px black;
+        background: rgba(255, 255, 255, 0.1);
+    }
+  
+      .command-bar__categories::-webkit-scrollbar-thumb  {
+        background-color: rgba(255, 255, 255, 0.1);
+        margin-left: 2px;
+        width: 4px;
     }
 
     .command-bar__category {
-        padding: 5px;
+        margin-top: 9px;
     }
 
     .command-bar__category__title {
+        padding: 5px;
+    }
+
+    .command-bar__category__name {
         color: rgba(255, 255, 255, .8);
         font-family: Consolas, monospace;
         font-size: 16px;
         margin: 0;
     }
 
-    .command-bar__category__title:hover,
-    .command-bar__category__title:active,
-    .command-bar__category__title:focus {
+    .command-bar__category__name:hover,
+    .command-bar__category__name:active,
+    .command-bar__category__name:focus {
       opacity: 0.8;
       outline-style: none;
       cursor: pointer;
@@ -113,22 +133,6 @@
       overflow: auto;
       position: relative;
       max-height: calc(100vh - 109px);
-    }
-
-    .command-bar__sandboxes::-webkit-scrollbar {
-      background-color: transparent;
-      width: 6px;
-    }
-
-    .command-bar__sandboxes::-webkit-scrollbar-track {
-      border-left: solid 1px black;
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .command-bar__sandboxes::-webkit-scrollbar-thumb  {
-      background-color: rgba(255, 255, 255, 0.1);
-      margin-left: 2px;
-      width: 4px;
     }
 
     .command-bar__sandbox {
