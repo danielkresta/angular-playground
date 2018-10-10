@@ -16,81 +16,83 @@
         (keydown.arrowdown)="onFilterBoxArrowDown($event)"
         (keydown.control.arrowup)="onFilterBoxArrowUp($event, true)"
         (keydown.control.arrowdown)="onFilterBoxArrowDown($event, true)">
-    <div
-        class="command-bar__categories"
-        *ngFor="let category of uniqueLabels; index as categoryIndex">
+    <div class="command-bar__categories">
         <div
             class="command-bar__category"
-            *ngIf="filteredSandboxMenuItems && filteredSandboxMenuItems.length > 0">
-            <span (click)="onCategoryClick(categoryIndex)"
-                class="command-bar__category__title">
-                {{category}}
-            </span>
-        </div>
-        <div *ngIf="filteredSandboxMenuItems && filteredSandboxMenuItems.length > 0
-                    && categoriesVisible[categoryIndex]"
-            class="command-bar__sandboxes">
-            <ng-container *ngFor="let sandboxMenuItem of filteredSandboxMenuItems; index as menuItemIndex">
-                <div class="command-bar__sandbox"
-                    *ngIf="sandboxMenuItem.label === category"
-                    (click)="onSandboxHeaderClick(menuItemIndex)">
-                    <h2 class="command-bar__title" title="{{sandboxMenuItem.label}} {{sandboxMenuItem.name}}"
-                        [class.command-bar__sandbox-title--selected]="selectedSandboxAndScenarioKeys.sandboxKey === sandboxMenuItem.key">
-                        <span class="command-bar__name"
-                            [innerHtml]="sandboxMenuItem.name | apHighlightSearchMatch : sandboxMenuItem.indexMatches"></span>
-                        <!--
-                        <span class="command-bar__label" *ngIf="sandboxMenuItem.label"
-                            [innerHtml]="sandboxMenuItem.label | apHighlightSearchMatch : sandboxMenuItem.indexMatches : sandboxMenuItem.name.length"></span>
-                        -->
-                    </h2>
-                    <ng-container
-                        *ngIf="groupsVisible[menuItemIndex]">
-                        <div 
-                            class="command-bar__sandbox__groups"
-                            *ngFor="let group of uniqueGroups[menuItemIndex].uniqueGroups; index as groupIndex">
-                            <div
-                                class="command-bar__sandbox__group"
-                                (click)="onGroupClick(menuItemIndex, groupIndex); onSandboxHeaderClick(menuItemIndex)"
-                                *ngIf="uniqueGroups[menuItemIndex].uniqueGroups.length > 1
-                                       || ( uniqueGroups[menuItemIndex].uniqueGroups.length === 1 && group !== 'default' ) ">
-                                <span
-                                    class="command-bar__sandbox__group__title">
-                                    {{group}}
-                                </span>
+            *ngFor="let category of uniqueLabels; index as categoryIndex">
+            <div
+                class="command-bar__category__title"
+                *ngIf="filteredSandboxMenuItems && filteredSandboxMenuItems.length > 0">
+                <span (click)="onCategoryClick(categoryIndex)"
+                    class="command-bar__category__name">
+                    {{category}}
+                </span>
+            </div>
+            <div *ngIf="filteredSandboxMenuItems && filteredSandboxMenuItems.length > 0
+                        && categoriesVisible[categoryIndex]"
+                class="command-bar__sandboxes">
+                <ng-container *ngFor="let sandboxMenuItem of filteredSandboxMenuItems; index as menuItemIndex">
+                    <div class="command-bar__sandbox"
+                        *ngIf="sandboxMenuItem.label === category"
+                        (click)="onSandboxHeaderClick(menuItemIndex)">
+                        <h2 class="command-bar__title" title="{{sandboxMenuItem.label}} {{sandboxMenuItem.name}}"
+                            [class.command-bar__sandbox-title--selected]="selectedSandboxAndScenarioKeys.sandboxKey === sandboxMenuItem.key">
+                            <span class="command-bar__name"
+                                [innerHtml]="sandboxMenuItem.name | apHighlightSearchMatch : sandboxMenuItem.indexMatches"></span>
+                            <!--
+                            <span class="command-bar__label" *ngIf="sandboxMenuItem.label"
+                                [innerHtml]="sandboxMenuItem.label | apHighlightSearchMatch : sandboxMenuItem.indexMatches : sandboxMenuItem.name.length"></span>
+                            -->
+                        </h2>
+                        <ng-container
+                            *ngIf="groupsVisible[menuItemIndex]">
+                            <div 
+                                class="command-bar__sandbox__groups"
+                                *ngFor="let group of uniqueGroups[menuItemIndex].uniqueGroups; index as groupIndex">
+                                <div
+                                    class="command-bar__sandbox__group"
+                                    (click)="onGroupClick(menuItemIndex, groupIndex); onSandboxHeaderClick(menuItemIndex)"
+                                    *ngIf="uniqueGroups[menuItemIndex].uniqueGroups.length > 1
+                                        || ( uniqueGroups[menuItemIndex].uniqueGroups.length === 1 && group !== 'default' ) ">
+                                    <span
+                                        class="command-bar__sandbox__group__title">
+                                        {{group}}
+                                    </span>
+                                </div>
+                                <div class="command-bar__scenarios"
+                                    *ngIf="scenariosVisible[menuItemIndex][groupIndex]">
+                                    <ng-container
+                                        *ngFor="let scenarioMenuItem of sandboxMenuItem.scenarioMenuItems; index as scenarioMenuItemIndex">
+                                        <a
+                                            *ngIf="groupContainsScenario( uniqueGroups[menuItemIndex].groupItems[groupIndex], scenarioMenuItem.description )
+                                                || ( uniqueGroups[menuItemIndex].uniqueGroups.length === 1 && group === 'default' )"
+                                            class="command-bar__scenario-link"
+                                            #scenarioElement
+                                            [tabindex]="scenarioMenuItem.tabIndex"
+                                            [attr.sandboxMenuItemKey]="sandboxMenuItem.key"
+                                            [attr.scenarioMenuItemkey]="scenarioMenuItem.key"
+                                            (keydown.control.arrowup)="onScenarioLinkControlUp(scenarioElement, $event)"
+                                            (keydown.control.arrowdown)="onScenarioLinkControlDown(scenarioElement, $event)"
+                                            (keydown.arrowup)="onScenarioLinkKeyDown(scenarioElement, filterElement, $event)"
+                                            (keydown.arrowdown)="onScenarioLinkKeyDown(scenarioElement, filterElement, $event)"
+                                            (keydown.esc)="onScenarioLinkKeyDown(scenarioElement, filterElement, $event)"
+                                            (keydown.enter)="onScenarioLinkKeyDown(scenarioElement, filterElement, $event)"
+                                            (keyup.esc)="onScenarioLinkKeyUp(scenarioElement, $event)"
+                                            (keyup.enter)="onScenarioLinkKeyUp(scenarioElement, $event)"
+                                            (click)="onScenarioClick(sandboxMenuItem.key, scenarioMenuItem.key, $event); toggleCommandBar(); onSandboxHeaderClick(menuItemIndex)"
+                                            [class.command-bar__scenario-link--selected]="isSelected(sandboxMenuItem, scenarioMenuItem)">
+                                            <ap-pin [selected]="isSelected(sandboxMenuItem, scenarioMenuItem)"></ap-pin>
+                                            <span class="command-bar__scenario-label">
+                                                {{scenarioMenuItem.description}}
+                                            </span>
+                                        </a>
+                                    </ng-container>
+                                </div>
                             </div>
-                            <div class="command-bar__scenarios"
-                                *ngIf="scenariosVisible[menuItemIndex][groupIndex]">
-                                <ng-container
-                                    *ngFor="let scenarioMenuItem of sandboxMenuItem.scenarioMenuItems; index as scenarioMenuItemIndex">
-                                    <a
-                                        *ngIf="groupContainsScenario( uniqueGroups[menuItemIndex].groupItems[groupIndex], scenarioMenuItem.description )
-                                               || ( uniqueGroups[menuItemIndex].uniqueGroups.length === 1 && group === 'default' )"
-                                        class="command-bar__scenario-link"
-                                        #scenarioElement
-                                        [tabindex]="scenarioMenuItem.tabIndex"
-                                        [attr.sandboxMenuItemKey]="sandboxMenuItem.key"
-                                        [attr.scenarioMenuItemkey]="scenarioMenuItem.key"
-                                        (keydown.control.arrowup)="onScenarioLinkControlUp(scenarioElement, $event)"
-                                        (keydown.control.arrowdown)="onScenarioLinkControlDown(scenarioElement, $event)"
-                                        (keydown.arrowup)="onScenarioLinkKeyDown(scenarioElement, filterElement, $event)"
-                                        (keydown.arrowdown)="onScenarioLinkKeyDown(scenarioElement, filterElement, $event)"
-                                        (keydown.esc)="onScenarioLinkKeyDown(scenarioElement, filterElement, $event)"
-                                        (keydown.enter)="onScenarioLinkKeyDown(scenarioElement, filterElement, $event)"
-                                        (keyup.esc)="onScenarioLinkKeyUp(scenarioElement, $event)"
-                                        (keyup.enter)="onScenarioLinkKeyUp(scenarioElement, $event)"
-                                        (click)="onScenarioClick(sandboxMenuItem.key, scenarioMenuItem.key, $event); toggleCommandBar(); onSandboxHeaderClick(menuItemIndex)"
-                                        [class.command-bar__scenario-link--selected]="isSelected(sandboxMenuItem, scenarioMenuItem)">
-                                        <ap-pin [selected]="isSelected(sandboxMenuItem, scenarioMenuItem)"></ap-pin>
-                                        <span class="command-bar__scenario-label">
-                                            {{scenarioMenuItem.description}}
-                                        </span>
-                                    </a>
-                                </ng-container>
-                            </div>
-                        </div>
-                    </ng-container>
-                </div>
-            </ng-container>
+                        </ng-container>
+                    </div>
+                </ng-container>
+            </div>
         </div>
     </div>
     <a *ngIf="filteredSandboxMenuItems && filteredSandboxMenuItems.length > 0" class="command-bar__brand"
