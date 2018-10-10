@@ -218,6 +218,10 @@ export class AppComponent {
         this.scenariosVisible[menuItemIndex][groupIndex] = !this.scenariosVisible[menuItemIndex][groupIndex];
     }
 
+    groupContainsScenario( groupItems: string[], scenario: string ): boolean {
+        return ( groupItems.indexOf( scenario ) >= 0 ) ? true : false;
+    }
+
     private blockEvent(e: KeyboardEvent) {
         e.preventDefault();
         e.stopPropagation();

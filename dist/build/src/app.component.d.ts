@@ -51,6 +51,7 @@ export declare class AppComponent {
     onCategoryClick(category: string): void;
     onSandboxHeaderClick(index: number): void;
     onGroupClick(menuItemIndex: any, groupIndex: any): void;
+    groupContainsScenario(groupItems: string[], scenario: string): boolean;
     private blockEvent;
     private showScenario;
     private findCurrentScenarioIndex;
