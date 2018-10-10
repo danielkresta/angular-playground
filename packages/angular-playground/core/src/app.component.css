@@ -149,7 +149,7 @@
 
     .command-bar__title {
       /*align-items: center;*/
-      color: rgba(255, 255, 255, .5);
+      color: rgba(255, 255, 255, .6);
       display: flex;
       font-family: Consolas, monospace;
       font-size: 12px;
@@ -181,9 +181,37 @@
       padding: 4px 5px 3px;
     }
 
+    /* Scenario Groups */
+
+    .command-bar__sandbox__group {
+        padding: 3px 10px 3px 3px;
+        display: inline-block;
+    }
+
+    .command-bar__sandbox__group__title {
+        color: rgba(255, 255, 255, .4);
+        font-family: Consolas, monospace;
+        font-size: 12px;
+        margin: 0;
+    }
+
+    .command-bar__sandbox__group__title:hover,
+    .command-bar__sandbox__group__title:active,
+    .command-bar__sandbox__group__title:focus {
+        opacity: 0.8;
+        outline-style: none;
+        cursor: pointer;
+    }
+
+    .command-bar__sandbox__groups{
+        margin: 3px;
+    }
+
     /* Scenarios */
     .command-bar__scenarios {
+      /*
       display: flex;
+      */
     }
 
     .command-bar__scenario-link {
