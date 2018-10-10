@@ -1,7 +1,7 @@
 import { Component, ElementRef, Inject, QueryList, ViewChildren } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { EventManager } from '@angular/platform-browser';
-import { SandboxMenuItem, SelectedSandboxAndScenarioKeys } from '../lib/app-state';
+import { SandboxMenuItem, SelectedSandboxAndScenarioKeys, ScenarioMenuItem } from '../lib/app-state';
 import { StateService } from './shared/state.service';
 import { UrlService } from './shared/url.service';
 import { fuzzySearch } from './shared/fuzzy-search.function';
@@ -10,6 +10,11 @@ import { SandboxLoader } from './shared/sandbox-loader';
 import { Middleware, MIDDLEWARE } from '../lib/middlewares';
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+
+export interface UniqueGroups {
+    uniqueGroups: string[];
+    groupItems: any[][];
+}
 
 @Component({
     selector: 'ap-root',
@@ -29,6 +34,9 @@ export class AppComponent {
     filter = new FormControl();
     shortcuts = this.getShortcuts();
     activeMiddleware: Middleware;
+    groupsVisible: boolean[] = [];
+    uniqueGroups: UniqueGroups[] = [];
+    scenariosVisible: any[] = [];
 
     constructor(private stateService: StateService,
                 private urlService: UrlService,
@@ -86,6 +94,14 @@ export class AppComponent {
                     this.selectScenario(null, null);
                 }
             });
+
+            for (let i = 0; i < this.filteredSandboxMenuItems.length; i++) {
+                this.uniqueGroups[i] = this.findUniqueGroups( this.filteredSandboxMenuItems[i].scenarioMenuItems );
+                this.scenariosVisible[i] = [] as boolean[];
+                if ( this.uniqueGroups[i].uniqueGroups.length === 1 && this.uniqueGroups[i].uniqueGroups[0] === 'default' ) {
+                    this.scenariosVisible[i][0] = true;
+                }
+            }
         }
     }
 
@@ -194,6 +210,14 @@ export class AppComponent {
         this.categoriesVisible[category]  = !this.categoriesVisible[category];
     }
 
+    onSandboxHeaderClick(index: number) {
+        this.groupsVisible[index]  = !this.groupsVisible[index];
+    }
+
+    onGroupClick(menuItemIndex, groupIndex) {
+        this.scenariosVisible[menuItemIndex][groupIndex] = !this.scenariosVisible[menuItemIndex][groupIndex];
+    }
+
     private blockEvent(e: KeyboardEvent) {
         e.preventDefault();
         e.stopPropagation();
@@ -271,6 +295,37 @@ export class AppComponent {
             return result;
         }, []);
         return uniqueLabels;
+    }
+
+    private findUniqueGroups( scenarioMenuItems: ScenarioMenuItem[] ): UniqueGroups {
+        const groupsRegex = /\s*([^;]+)(?:[;,]\s*subgroup:([^;]+))?/;
+        let groupItems: any[][] = [];
+        let group: string;
+        let description: string;
+        const uniqueGroups: string[] = scenarioMenuItems.reduce( (result, item ) => {
+            // String expected to contain encoded group and description
+            [, description, group] = groupsRegex.exec( item.description )
+            // reset regex
+            groupsRegex.lastIndex = 0;
+            item.description = description;
+            // TODO: default group here or in the sender
+            group = group === undefined ? 'default' : group;
+            // Find if group already exists in the list
+            let groupIndex = result.indexOf( group )
+            if ( groupIndex === -1 ) {
+                // Add the new group to the list
+                result.push( group );
+                groupIndex = result.length - 1;
+                groupItems[groupIndex] = new Array();
+            }
+            // Add the scenario description to the group list
+            groupItems[groupIndex].push( description );
+            return result;
+        }, []);
+        return {
+            uniqueGroups: uniqueGroups,
+            groupItems: groupItems
+        };
     }
 
     private filterSandboxes(sandboxMenuItems: SandboxMenuItem[], filter: string) {
