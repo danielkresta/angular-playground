@@ -1,8 +1,7 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
-/packages/angular-playground/build/
-/src/**/*.ngfactory.ts
+/build/
 *.ngsummary.json
 **/.idea/*
 
@@ -33,9 +32,9 @@ testem.log
 /e2e/*.map
 
 # schematics
-/packages/angular-playground/schematics/**/*.js
-/packages/angular-playground/schematics/**/*.d.ts
-/packages/angular-playground/schematics/**/*.map
+/schematics/**/*.js
+/schematics/**/*.d.ts
+/schematics/**/*.map
 
 #System Files
 .DS_Store
