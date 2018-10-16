@@ -23,7 +23,7 @@ export declare class AppComponent {
     totalSandboxes: number;
     sandboxMenuItems: SandboxMenuItem[];
     uniqueLabels: string[];
-    categoriesVisible: boolean[];
+    sandboxesVisible: boolean[];
     filteredSandboxMenuItems: SandboxMenuItem[];
     selectedSandboxAndScenarioKeys: SelectedSandboxAndScenarioKeys;
     filter: FormControl;
@@ -63,4 +63,5 @@ export declare class AppComponent {
     private filterSandboxes;
     private selectScenario;
     private getShortcuts;
+    private expandSelectedScenario;
 }

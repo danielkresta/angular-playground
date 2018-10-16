@@ -28,7 +28,7 @@ export class AppComponent {
     totalSandboxes: number;
     sandboxMenuItems: SandboxMenuItem[];
     uniqueLabels: string[] = [];
-    categoriesVisible: boolean[] = [];
+    sandboxesVisible: boolean[] = [];
     filteredSandboxMenuItems: SandboxMenuItem[];
     selectedSandboxAndScenarioKeys: SelectedSandboxAndScenarioKeys = { sandboxKey: null, scenarioKey: null };
     filter = new FormControl();
@@ -101,8 +101,11 @@ export class AppComponent {
                 if ( this.uniqueGroups[i].uniqueGroups.length === 1 && this.uniqueGroups[i].uniqueGroups[0] === 'default' ) {
                     this.scenariosVisible[i][0] = true;
                 }
+                if ( this.filteredSandboxMenuItems[i].key === this.selectedSandboxAndScenarioKeys.sandboxKey ) {
+                    this.expandSelectedScenario( this.selectedSandboxAndScenarioKeys, i );
             }
         }
+    }
     }
 
     onFilterBoxArrowDown(event: any, switchToScenario = false) {
@@ -207,7 +210,7 @@ export class AppComponent {
     }
 
     onCategoryClick( category: string ) {
-        this.categoriesVisible[category]  = !this.categoriesVisible[category];
+        this.sandboxesVisible[category]  = !this.sandboxesVisible[category];
     }
 
     onSandboxHeaderClick(index: number) {
@@ -291,6 +294,9 @@ export class AppComponent {
     }
 
     private findUniqueLabels( sandboxMenuItems: SandboxMenuItem[] ): string[] {
+        if ( sandboxMenuItems == null ) {
+            return;
+        }
         const uniqueLabels: string[] = sandboxMenuItems.reduce( (result, item ) => {
             item.label = item.label || 'Default';
             if (result.indexOf(item.label) === -1) {
@@ -381,5 +387,26 @@ export class AppComponent {
                 description: 'Switch scenarios while navigating up or down in command bar list'
             }
         ];
+    }
+
+    private expandSelectedScenario( selected: SelectedSandboxAndScenarioKeys, sandboxIndex: number ) {
+        // Find the index of Category/Label of the selected sandbox
+        const categoryIndex = this.uniqueLabels.indexOf( this.filteredSandboxMenuItems[sandboxIndex].label );
+        let groupIndex = 0;
+        // Search through stored Scenario names to find the Group index
+        for (let i = 0; i < this.uniqueGroups[sandboxIndex].groupItems.length; i++) {
+            if ( 
+                this.uniqueGroups[sandboxIndex].groupItems[i].indexOf( 
+                    this.filteredSandboxMenuItems[sandboxIndex].scenarioMenuItems[ selected.scenarioKey - 1 ].description
+                ) !== -1
+            ) {
+                groupIndex = i;
+                break;
+            }
+        }
+        // Enable the visibility of all the menu levels
+        this.sandboxesVisible[categoryIndex] = true;
+        this.groupsVisible[sandboxIndex] = true;
+        this.scenariosVisible[sandboxIndex][groupIndex] = true;
     }
 }

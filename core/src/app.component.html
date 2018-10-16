@@ -29,7 +29,7 @@
                 </span>
             </div>
             <div *ngIf="filteredSandboxMenuItems && filteredSandboxMenuItems.length > 0
-                        && categoriesVisible[categoryIndex]"
+                        && sandboxesVisible[categoryIndex]"
                 class="command-bar__sandboxes">
                 <ng-container *ngFor="let sandboxMenuItem of filteredSandboxMenuItems; index as menuItemIndex">
                     <div class="command-bar__sandbox"
