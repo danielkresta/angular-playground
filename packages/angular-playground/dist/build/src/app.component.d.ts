@@ -1,15 +1,37 @@
 import { ElementRef, QueryList } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { EventManager } from '@angular/platform-browser';
-import { SandboxMenuItem, SelectedSandboxAndScenarioKeys } from '../lib/app-state';
+import { SandboxMenuItem, SelectedSandboxAndScenarioKeys, ScenarioMenuItem } from '../lib/app-state';
 import { StateService } from './shared/state.service';
 import { UrlService } from './shared/url.service';
 import { LevenshteinDistance } from './shared/levenshtein-distance';
 import { Middleware } from '../lib/middlewares';
 import { Observable } from 'rxjs';
-export interface UniqueGroups {
-    uniqueGroups: string[];
-    groupItems: any[][];
+export interface MenuCategories {
+    name: string;
+    visible: boolean;
+    sandboxes: MenuSandboxes[];
+}
+export interface MenuSandboxes {
+    name: string;
+    visible: boolean;
+    sandboxMenuItem: SandboxMenuItem;
+    groups: MenuScenarioGroups[];
+}
+export interface MenuScenarioGroups {
+    name: string;
+    visible: boolean;
+    scenarios: MenuScenarios[];
+}
+export interface MenuScenarios {
+    name: string;
+    scenarioMenuItem: ScenarioMenuItem;
+}
+export interface menuIndex {
+    categoryIndex: number;
+    sandboxIndex: number;
+    groupIndex: number;
+    scenarioIndex: number;
 }
 export declare class AppComponent {
     private stateService;
@@ -21,9 +43,6 @@ export declare class AppComponent {
     commandBarActive: boolean;
     commandBarPreview: boolean;
     totalSandboxes: number;
-    sandboxMenuItems: SandboxMenuItem[];
-    uniqueLabels: string[];
-    sandboxesVisible: boolean[];
     filteredSandboxMenuItems: SandboxMenuItem[];
     selectedSandboxAndScenarioKeys: SelectedSandboxAndScenarioKeys;
     filter: FormControl;
@@ -32,9 +51,7 @@ export declare class AppComponent {
         description: string;
     }[];
     activeMiddleware: Middleware;
-    groupsVisible: boolean[];
-    uniqueGroups: UniqueGroups[];
-    scenariosVisible: any[];
+    menuCategories: MenuCategories[];
     constructor(stateService: StateService, urlService: UrlService, eventManager: EventManager, levenshteinDistance: LevenshteinDistance, middleware: Observable<Middleware>);
     ngOnInit(): void;
     onFilterBoxArrowDown(event: any, switchToScenario?: boolean): void;
@@ -48,10 +65,9 @@ export declare class AppComponent {
     onScenarioClick(sandboxKey: string, scenarioKey: number, event: any): void;
     isSelected(sandbox: any, scenario: any): boolean;
     toggleCommandBar(): void;
-    onCategoryClick(category: string): void;
-    onSandboxHeaderClick(index: number): void;
-    onGroupClick(menuItemIndex: any, groupIndex: any): void;
-    groupContainsScenario(groupItems: string[], scenario: string): boolean;
+    onCategoryClick(category: MenuCategories, event: any): void;
+    onSandboxHeaderClick(sandbox: MenuSandboxes, event: any): void;
+    onGroupClick(group: MenuScenarioGroups, event: any): void;
     private blockEvent;
     private showScenario;
     private findCurrentScenarioIndex;
@@ -59,9 +75,10 @@ export declare class AppComponent {
     private goDown;
     private focusScenarioLinkElement;
     private findUniqueLabels;
-    private findUniqueGroups;
+    private assignGroups;
     private filterSandboxes;
     private selectScenario;
     private getShortcuts;
     private expandSelectedScenario;
+    private findItemByKey;
 }

@@ -11,9 +11,35 @@ import { Middleware, MIDDLEWARE } from '../lib/middlewares';
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
-export interface UniqueGroups {
-    uniqueGroups: string[];
-    groupItems: any[][];
+export interface MenuCategories {
+    name: string;
+    visible: boolean;
+    sandboxes: MenuSandboxes[];
+}
+
+export interface MenuSandboxes {
+    name: string;
+    visible: boolean;
+    sandboxMenuItem: SandboxMenuItem;
+    groups: MenuScenarioGroups[];
+}
+
+export interface MenuScenarioGroups {
+    name: string;
+    visible: boolean;
+    scenarios: MenuScenarios[]
+}
+
+export interface MenuScenarios {
+    name: string;
+    scenarioMenuItem: ScenarioMenuItem;
+}
+
+export interface menuIndex {
+    categoryIndex: number;
+    sandboxIndex: number;
+    groupIndex: number;
+    scenarioIndex: number;
 }
 
 @Component({
@@ -26,17 +52,12 @@ export class AppComponent {
     commandBarActive = false;
     commandBarPreview = false;
     totalSandboxes: number;
-    sandboxMenuItems: SandboxMenuItem[];
-    uniqueLabels: string[] = [];
-    sandboxesVisible: boolean[] = [];
     filteredSandboxMenuItems: SandboxMenuItem[];
     selectedSandboxAndScenarioKeys: SelectedSandboxAndScenarioKeys = { sandboxKey: null, scenarioKey: null };
     filter = new FormControl();
     shortcuts = this.getShortcuts();
     activeMiddleware: Middleware;
-    groupsVisible: boolean[] = [];
-    uniqueGroups: UniqueGroups[] = [];
-    scenariosVisible: any[] = [];
+    menuCategories: MenuCategories[];
 
     constructor(private stateService: StateService,
                 private urlService: UrlService,
@@ -46,7 +67,7 @@ export class AppComponent {
     }
 
     ngOnInit() {
-        this.sandboxMenuItems = SandboxLoader.getSandboxMenuItems();
+        const sandboxMenuItems = SandboxLoader.getSandboxMenuItems();
 
         this.middleware
             .subscribe(middleware => this.activeMiddleware = middleware);
@@ -77,10 +98,11 @@ export class AppComponent {
                 this.toggleCommandBar();
             });
 
-            this.uniqueLabels = this.findUniqueLabels( this.sandboxMenuItems );
             let filterValue = this.stateService.getFilter();
-            this.totalSandboxes = this.sandboxMenuItems.length;
-            this.filteredSandboxMenuItems = this.filterSandboxes(this.sandboxMenuItems, filterValue);
+            this.totalSandboxes = sandboxMenuItems.length;
+            this.filteredSandboxMenuItems = this.filterSandboxes(sandboxMenuItems, filterValue);
+            this.findUniqueLabels( sandboxMenuItems );
+            this.expandSelectedScenario( this.selectedSandboxAndScenarioKeys );
             this.filter.setValue(filterValue);
             this.filter.valueChanges.pipe
             (
@@ -89,23 +111,14 @@ export class AppComponent {
             )
             .subscribe(value => {
                 this.stateService.setFilter(value);
-                this.filteredSandboxMenuItems = this.filterSandboxes(this.sandboxMenuItems, value);
+                this.filteredSandboxMenuItems = this.filterSandboxes(sandboxMenuItems, value);
+                this.findUniqueLabels( this.filteredSandboxMenuItems );
+                console.log( this.menuCategories )
                 if (!value) {
-                    this.selectScenario(null, null);
+                    //this.selectScenario(null, null);
                 }
             });
-
-            for (let i = 0; i < this.filteredSandboxMenuItems.length; i++) {
-                this.uniqueGroups[i] = this.findUniqueGroups( this.filteredSandboxMenuItems[i].scenarioMenuItems );
-                this.scenariosVisible[i] = [] as boolean[];
-                if ( this.uniqueGroups[i].uniqueGroups.length === 1 && this.uniqueGroups[i].uniqueGroups[0] === 'default' ) {
-                    this.scenariosVisible[i][0] = true;
-                }
-                if ( this.filteredSandboxMenuItems[i].key === this.selectedSandboxAndScenarioKeys.sandboxKey ) {
-                    this.expandSelectedScenario( this.selectedSandboxAndScenarioKeys, i );
-            }
         }
-    }
     }
 
     onFilterBoxArrowDown(event: any, switchToScenario = false) {
@@ -196,6 +209,7 @@ export class AppComponent {
     }
 
     onScenarioClick(sandboxKey: string, scenarioKey: number, event: any) {
+        event.stopPropagation();
         event.preventDefault();
         this.selectScenario(sandboxKey, scenarioKey);
     }
@@ -209,20 +223,19 @@ export class AppComponent {
         this.commandBarActive = !this.commandBarActive;
     }
 
-    onCategoryClick( category: string ) {
-        this.sandboxesVisible[category]  = !this.sandboxesVisible[category];
+    onCategoryClick( category: MenuCategories, event: any ) {
+        event.stopPropagation();
+        category.visible = !category.visible;
     }
 
-    onSandboxHeaderClick(index: number) {
-        this.groupsVisible[index]  = !this.groupsVisible[index];
+    onSandboxHeaderClick( sandbox: MenuSandboxes, event: any ) {
+        event.stopPropagation();
+        sandbox.visible = !sandbox.visible;
     }
 
-    onGroupClick(menuItemIndex, groupIndex) {
-        this.scenariosVisible[menuItemIndex][groupIndex] = !this.scenariosVisible[menuItemIndex][groupIndex];
-    }
-
-    groupContainsScenario( groupItems: string[], scenario: string ): boolean {
-        return ( groupItems.indexOf( scenario ) >= 0 ) ? true : false;
+    onGroupClick( group: MenuScenarioGroups, event: any ) {
+        event.stopPropagation();
+        group.visible = !group.visible;
     }
 
     private blockEvent(e: KeyboardEvent) {
@@ -293,49 +306,71 @@ export class AppComponent {
         }
     }
 
-    private findUniqueLabels( sandboxMenuItems: SandboxMenuItem[] ): string[] {
+    private findUniqueLabels( sandboxMenuItems: SandboxMenuItem[] ): void {
         if ( sandboxMenuItems == null ) {
             return;
         }
-        const uniqueLabels: string[] = sandboxMenuItems.reduce( (result, item ) => {
-            item.label = item.label || 'Default';
-            if (result.indexOf(item.label) === -1) {
-                result.push(item.label)
+        this.menuCategories = sandboxMenuItems.reduce( (result, item ) => {
+            let categoryIndex = result.findIndex( obj => obj.name === item.label );
+            let sandboxIndex: number;
+            if ( categoryIndex === -1 ) {
+                categoryIndex = result.length;
+                sandboxIndex = 0;
+                result.push({
+                    name: item.label,
+                    visible: true,
+                    sandboxes: [{
+                        name: item.name,
+                        visible: false,
+                        sandboxMenuItem: item,
+                        groups: []
+                    }]
+                })
+            } else if ( categoryIndex > -1 ) {
+                sandboxIndex = result[categoryIndex].sandboxes.length;
+                result[categoryIndex].sandboxes.push({
+                    name: item.name,
+                    visible: false,
+                    sandboxMenuItem: item,
+                    groups: []
+                })
             }
+            this.assignGroups( result[categoryIndex].sandboxes[sandboxIndex] );
             return result;
         }, []);
-        return uniqueLabels;
+        return;
     }
 
-    private findUniqueGroups( scenarioMenuItems: ScenarioMenuItem[] ): UniqueGroups {
+    private assignGroups( sandbox: MenuSandboxes ): void {
         const groupsRegex = /\s*([^;]+)(?:[;,]\s*subgroup:([^;]+))?/;
-        let groupItems: any[][] = [];
         let group: string;
         let description: string;
-        const uniqueGroups: string[] = scenarioMenuItems.reduce( (result, item ) => {
+        sandbox.sandboxMenuItem.scenarioMenuItems.forEach( item => {
             // String expected to contain encoded group and description
             [, description, group] = groupsRegex.exec( item.description )
             // reset regex
             groupsRegex.lastIndex = 0;
-            item.description = description;
-            // TODO: default group here or in the sender
             group = group === undefined ? 'default' : group;
             // Find if group already exists in the list
-            let groupIndex = result.indexOf( group )
+            let groupIndex = sandbox.groups.findIndex( obj => obj.name === group );
             if ( groupIndex === -1 ) {
-                // Add the new group to the list
-                result.push( group );
-                groupIndex = result.length - 1;
-                groupItems[groupIndex] = new Array();
+                groupIndex = sandbox.groups.length;
+                sandbox.groups.push({
+                    name: group,
+                    visible: false,
+                    scenarios: [{
+                        name: description,
+                        scenarioMenuItem: item
+                    }]
+                });
+            } else if ( groupIndex > -1 ) {
+                sandbox.groups[groupIndex].scenarios.push({
+                    name: description,
+                    scenarioMenuItem: item
+                });
             }
-            // Add the scenario description to the group list
-            groupItems[groupIndex].push( description );
-            return result;
-        }, []);
-        return {
-            uniqueGroups: uniqueGroups,
-            groupItems: groupItems
-        };
+        });
+        return;
     }
 
     private filterSandboxes(sandboxMenuItems: SandboxMenuItem[], filter: string) {
@@ -389,24 +424,43 @@ export class AppComponent {
         ];
     }
 
-    private expandSelectedScenario( selected: SelectedSandboxAndScenarioKeys, sandboxIndex: number ) {
-        // Find the index of Category/Label of the selected sandbox
-        const categoryIndex = this.uniqueLabels.indexOf( this.filteredSandboxMenuItems[sandboxIndex].label );
-        let groupIndex = 0;
-        // Search through stored Scenario names to find the Group index
-        for (let i = 0; i < this.uniqueGroups[sandboxIndex].groupItems.length; i++) {
-            if ( 
-                this.uniqueGroups[sandboxIndex].groupItems[i].indexOf( 
-                    this.filteredSandboxMenuItems[sandboxIndex].scenarioMenuItems[ selected.scenarioKey - 1 ].description
-                ) !== -1
-            ) {
-                groupIndex = i;
+    private expandSelectedScenario( selected: SelectedSandboxAndScenarioKeys ): void {
+        if ( selected.sandboxKey == null && selected.scenarioKey == null ) {
+            return;
+        }
+        let index: menuIndex;
+        index = this.findItemByKey( selected.sandboxKey, selected.scenarioKey );
+        this.menuCategories[index.categoryIndex].visible = true;
+        this.menuCategories[index.categoryIndex].sandboxes[index.sandboxIndex].visible = true;
+        this.menuCategories[index.categoryIndex].sandboxes[index.sandboxIndex].groups[index.groupIndex].visible = true;
+        return;
+    }
+
+    private findItemByKey( sandboxKey, scenarioKey? ): menuIndex {
+        let categoryIndex = null;
+        let sandboxIndex = null;
+        let groupIndex = null;
+        let scenarioIndex = null;
+        for (categoryIndex = 0; categoryIndex < this.menuCategories.length; categoryIndex++) {
+            sandboxIndex = this.menuCategories[categoryIndex].sandboxes.findIndex( obj => obj.sandboxMenuItem.key === sandboxKey );
+            if ( sandboxIndex > -1 ) {
                 break;
             }
         }
-        // Enable the visibility of all the menu levels
-        this.sandboxesVisible[categoryIndex] = true;
-        this.groupsVisible[sandboxIndex] = true;
-        this.scenariosVisible[sandboxIndex][groupIndex] = true;
+        if ( scenarioKey != null ) {
+            const groups = this.menuCategories[categoryIndex].sandboxes[sandboxIndex].groups;
+            for (groupIndex = 0; groupIndex < this.menuCategories.length; groupIndex++) {
+                scenarioIndex = groups[groupIndex].scenarios.findIndex( obj => obj.scenarioMenuItem.key === scenarioKey );
+                if ( scenarioIndex > -1 ) {
+                    break;
+                }
+            }
+        }
+        return {
+            categoryIndex: categoryIndex,
+            sandboxIndex: sandboxIndex,
+            groupIndex: groupIndex,
+            scenarioIndex: scenarioIndex
+        }
     }
 }
