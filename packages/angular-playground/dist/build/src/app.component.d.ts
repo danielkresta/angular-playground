@@ -67,6 +67,7 @@ export declare class AppComponent {
     toggleCommandBar(): void;
     onCategoryClick(category: MenuCategories, event: any): void;
     onSandboxHeaderClick(sandbox: MenuSandboxes, event: any): void;
+    onLabelClick(event: any): void;
     onGroupClick(group: MenuScenarioGroups, event: any): void;
     private blockEvent;
     private showScenario;
@@ -75,6 +76,7 @@ export declare class AppComponent {
     private goDown;
     private focusScenarioLinkElement;
     private findUniqueLabels;
+    private getDocsUrl;
     private assignGroups;
     private filterSandboxes;
     private selectScenario;

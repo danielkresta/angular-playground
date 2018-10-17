@@ -38,10 +38,13 @@
                             [class.command-bar__sandbox-title--selected]="selectedSandboxAndScenarioKeys.sandboxKey === sandbox.sandboxMenuItem.key">
                             <span class="command-bar__name"
                                 [innerHtml]="sandbox.name | apHighlightSearchMatch : sandbox.sandboxMenuItem.indexMatches"></span>
-                            <!--
-                            <span class="command-bar__label" *ngIf="category"
-                                [innerHtml]="category | apHighlightSearchMatch : sandbox.sandboxMenuItem.indexMatches : sandboxMenuItem.name.length"></span>
-                            -->
+                            <a
+                                class="command-bar__label"
+                                [href]="sandbox.docsUrl"
+                                target="_blank"
+                                (click)=onLabelClick($event)>
+                                doc
+                            </a>
                         </h2>
                         <ng-container
                             *ngIf="sandbox.visible">
