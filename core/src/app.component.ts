@@ -233,6 +233,10 @@ export class AppComponent {
         sandbox.visible = !sandbox.visible;
     }
 
+    onLabelClick( event: any ) {
+        event.stopPropagation();
+    }
+
     onGroupClick( group: MenuScenarioGroups, event: any ) {
         event.stopPropagation();
         group.visible = !group.visible;
@@ -322,6 +326,7 @@ export class AppComponent {
                     sandboxes: [{
                         name: item.name,
                         visible: false,
+                        docsUrl: this.getDocsUrl( item.label, item.name ),
                         sandboxMenuItem: item,
                         groups: []
                     }]
@@ -331,6 +336,7 @@ export class AppComponent {
                 result[categoryIndex].sandboxes.push({
                     name: item.name,
                     visible: false,
+                    docsUrl: this.getDocsUrl( item.label, item.name ),
                     sandboxMenuItem: item,
                     groups: []
                 })
@@ -339,6 +345,12 @@ export class AppComponent {
             return result;
         }, []);
         return;
+    }
+
+    private getDocsUrl( category: string, component: string ): string {
+        const docsFixedPrefix = 'http://sparrow.logex.local/framework-documentation/#!/directives/';
+        component = component.split(/(?=[A-Z])/).join("-").toLowerCase();
+        return docsFixedPrefix + category.toLowerCase + '/' + component;
     }
 
     private assignGroups( sandbox: MenuSandboxes ): void {
