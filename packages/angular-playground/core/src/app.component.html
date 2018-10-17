@@ -34,7 +34,7 @@
                 <ng-container *ngFor="let sandbox of category.sandboxes; index as sandboxIndex">
                     <div class="command-bar__sandbox"
                         (click)="onSandboxHeaderClick(sandbox, $event)">
-                        <h2 class="command-bar__title" title="{{category}} {{sandbox.name}}"
+                        <h2 class="command-bar__title" title="{{category.name}} {{sandbox.name}}"
                             [class.command-bar__sandbox-title--selected]="selectedSandboxAndScenarioKeys.sandboxKey === sandbox.sandboxMenuItem.key">
                             <span class="command-bar__name"
                                 [innerHtml]="sandbox.name | apHighlightSearchMatch : sandbox.sandboxMenuItem.indexMatches"></span>

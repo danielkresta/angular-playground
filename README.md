@@ -17,6 +17,28 @@ fix broken UI.
 * Angular 6.x and up
 * [CLI quick-start](http://www.angularplayground.it/docs/getting-started/angular-cli)
 
+### Added features
+
+* Categories - if you add a label to the [SandboxOfConfig object](http://www.angularplayground.it/docs/api/sandbox), it will be used as a category in the top level of the command bar menu. If no label is used, the sandbox is assigned to a Default category.
+
+```typescript
+export default sandboxOf( 
+    LgDropdownComponent,
+    {
+        label: "Controls",
+        imports: 
+        []
+        /* ... */
+    }
+)
+```
+
+* Subgroups / Scenario Groups - Every scenario of sandbox can be assigned to a group of scenarios. This group then becomes a third level item in the command bar menu. A group can be configured by appending *; subgroup:custom-group-name* to the end of the scenario description.
+
+```typescript
+ .add('default; subgroup:Group 1', {} 
+```
+
 ## Articles
 
 * [Developing and Running Components in a Sandbox!](https://blog.codewithdan.com/2017/11/21/angular-playground-developing-and-running-components-in-a-sandbox/)
