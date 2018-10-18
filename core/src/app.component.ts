@@ -350,7 +350,7 @@ export class AppComponent {
     private getDocsUrl( category: string, component: string ): string {
         const docsFixedPrefix = 'http://sparrow.logex.local/framework-documentation/#!/directives/';
         component = component.split(/(?=[A-Z])/).join("-").toLowerCase();
-        return docsFixedPrefix + category.toLowerCase + '/' + component;
+        return docsFixedPrefix + category.toLowerCase() + '/' + component;
     }
 
     private assignGroups( sandbox: MenuSandboxes ): void {
