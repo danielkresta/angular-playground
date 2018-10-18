@@ -274,7 +274,7 @@ var AppComponent = /** @class */ (function () {
     AppComponent.prototype.getDocsUrl = function (category, component) {
         var docsFixedPrefix = 'http://sparrow.logex.local/framework-documentation/#!/directives/';
         component = component.split(/(?=[A-Z])/).join("-").toLowerCase();
-        return docsFixedPrefix + category.toLowerCase + '/' + component;
+        return docsFixedPrefix + category.toLowerCase() + '/' + component;
     };
     AppComponent.prototype.assignGroups = function (sandbox) {
         var groupsRegex = /\s*([^;]+)(?:[;,]\s*subgroup:([^;]+))?/;
