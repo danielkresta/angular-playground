@@ -350,7 +350,12 @@ export class AppComponent {
     private getDocsUrl( category: string, component: string ): string {
         const docsFixedPrefix = 'http://sparrow.logex.local/framework-documentation/#!/directives/';
         const componentRegex = /Component/gi
-        component = component.replace(componentRegex, '').split(/(?=[A-Z])/).join("-").toLowerCase();
+        const pipeRegex = /Pipe/gi
+        component = component
+            .replace(componentRegex, '')
+            .replace(pipeRegex, '')
+            .split(/(?=[A-Z])/)
+            .join("-").toLowerCase();
         return docsFixedPrefix + category.toLowerCase() + '/' + component;
     }
 
