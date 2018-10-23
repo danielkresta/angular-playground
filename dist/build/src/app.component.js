@@ -273,7 +273,8 @@ var AppComponent = /** @class */ (function () {
     };
     AppComponent.prototype.getDocsUrl = function (category, component) {
         var docsFixedPrefix = 'http://sparrow.logex.local/framework-documentation/#!/directives/';
-        component = component.split(/(?=[A-Z])/).join("-").toLowerCase();
+        var componentRegex = /Component/gi;
+        component = component.replace(componentRegex, '').split(/(?=[A-Z])/).join("-").toLowerCase();
         return docsFixedPrefix + category.toLowerCase() + '/' + component;
     };
     AppComponent.prototype.assignGroups = function (sandbox) {
