@@ -351,9 +351,11 @@ export class AppComponent {
         const docsFixedPrefix = 'http://sparrow.logex.local/framework-documentation/#!/directives/';
         const componentRegex = /Component/gi
         const pipeRegex = /Pipe/gi
+        const directiveRegex = /Directive/gi
         component = component
             .replace(componentRegex, '')
             .replace(pipeRegex, '')
+            .replace(directiveRegex, '')
             .split(/(?=[A-Z])/)
             .join("-").toLowerCase();
         return docsFixedPrefix + category.toLowerCase() + '/' + component;
