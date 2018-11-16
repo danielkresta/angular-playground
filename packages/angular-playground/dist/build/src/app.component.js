@@ -275,9 +275,11 @@ var AppComponent = /** @class */ (function () {
         var docsFixedPrefix = 'http://sparrow.logex.local/framework-documentation/#!/directives/';
         var componentRegex = /Component/gi;
         var pipeRegex = /Pipe/gi;
+        var directiveRegex = /Directive/gi;
         component = component
             .replace(componentRegex, '')
             .replace(pipeRegex, '')
+            .replace(directiveRegex, '')
             .split(/(?=[A-Z])/)
             .join("-").toLowerCase();
         return docsFixedPrefix + category.toLowerCase() + '/' + component;
