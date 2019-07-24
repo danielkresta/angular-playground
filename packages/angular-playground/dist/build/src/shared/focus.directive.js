@@ -1,33 +1,30 @@
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata = (this && this.__metadata) || function (k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
 import { Directive, Input, ElementRef } from '@angular/core';
-let FocusDirective = class FocusDirective {
-    constructor(elementRef) {
+var FocusDirective = /** @class */ (function () {
+    function FocusDirective(elementRef) {
         this.elementRef = elementRef;
     }
-    set apFocus(value) {
-        if (value) {
-            this.elementRef.nativeElement.focus();
-        }
-    }
-};
-__decorate([
-    Input(),
-    __metadata("design:type", Object),
-    __metadata("design:paramtypes", [Object])
-], FocusDirective.prototype, "apFocus", null);
-FocusDirective = __decorate([
-    Directive({
-        selector: '[apFocus]',
-    }),
-    __metadata("design:paramtypes", [ElementRef])
-], FocusDirective);
+    Object.defineProperty(FocusDirective.prototype, "apFocus", {
+        set: function (value) {
+            if (value) {
+                this.elementRef.nativeElement.focus();
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    FocusDirective.decorators = [
+        { type: Directive, args: [{
+                    selector: '[apFocus]'
+                },] },
+    ];
+    /** @nocollapse */
+    FocusDirective.ctorParameters = function () { return [
+        { type: ElementRef }
+    ]; };
+    FocusDirective.propDecorators = {
+        apFocus: [{ type: Input }]
+    };
+    return FocusDirective;
+}());
 export { FocusDirective };
 //# sourceMappingURL=focus.directive.js.map

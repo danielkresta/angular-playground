@@ -1,1 +1,1 @@
-{"version":3,"file":"sandboxes.js","sourceRoot":"","sources":["../../../../build/src/shared/sandboxes.ts"],"names":[],"mappings":"AAAA,iDAAiD;AACjD,kDAAkD;AAElD,MAAM,UAAU,UAAU,CAAE,IAAI;AAChC,CAAC;AAED,MAAM,UAAU,mBAAmB;IAC/B,OAAO,IAAI,CAAC;AAChB,CAAC"}
+{"version":3,"file":"sandboxes.js","sourceRoot":"","sources":["../../../../build/src/shared/sandboxes.ts"],"names":[],"mappings":"AAAA,iDAAiD;AACjD,kDAAkD;AAElD,MAAM,qBAAsB,IAAI;AAChC,CAAC;AAED,MAAM;IACF,OAAO,IAAI,CAAC;AAChB,CAAC"}

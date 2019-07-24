@@ -4,12 +4,12 @@ const fs_1 = require("fs");
 const path_1 = require("path");
 const from_dir_1 = require("./from-dir");
 const string_builder_1 = require("./string-builder");
-function buildSandboxes(srcPaths, chunk) {
+function buildSandboxes(srcPath, chunk) {
     const chunkMode = chunk ? 'lazy' : 'eager';
-    const homes = srcPaths.map(srcPath => path_1.resolve(srcPath));
-    const sandboxes = findSandboxes(homes);
+    const home = path_1.resolve(srcPath);
+    const sandboxes = findSandboxes(home);
     const filePath = path_1.resolve(__dirname, '../../build/src/shared/sandboxes.js');
-    const fileContent = buildSandboxFileContents(sandboxes, chunkMode);
+    const fileContent = buildSandboxFileContents(sandboxes, home, chunkMode);
     return new Promise((resolve, reject) => {
         fs_1.writeFile(filePath, fileContent, err => {
             if (err) {
@@ -21,9 +21,9 @@ function buildSandboxes(srcPaths, chunk) {
     });
 }
 exports.buildSandboxes = buildSandboxes;
-function findSandboxes(homes) {
+function findSandboxes(home) {
     const sandboxes = [];
-    from_dir_1.fromDirMultiple(homes, /\.sandbox.ts$/, (filename, home) => {
+    from_dir_1.fromDir(home, /\.sandbox.ts$/, (filename) => {
         let sandboxPath = filename.replace(home, '.').replace(/.ts$/, '').replace(/\\/g, '/');
         const contents = fs_1.readFileSync(filename, 'utf8');
         const matchSandboxOf = /\s?sandboxOf\s*\(\s*([^)]+?)\s*\)/g.exec(contents);
@@ -44,18 +44,17 @@ function findSandboxes(homes) {
             let label = labelText ? labelText[1] : '';
             sandboxes.push({
                 key: sandboxPath,
-                srcPath: home,
                 searchKey: `${typeName}${label}`,
                 name: typeName,
                 label: label,
-                scenarioMenuItems,
+                scenarioMenuItems
             });
         }
     });
     return sandboxes;
 }
 exports.findSandboxes = findSandboxes;
-function buildSandboxFileContents(sandboxes, chunkMode) {
+function buildSandboxFileContents(sandboxes, home, chunkMode) {
     const content = new string_builder_1.StringBuilder();
     content.addLine(`function getSandboxMenuItems() {`);
     content.addLine(`return ${JSON.stringify(sandboxes)};`);
@@ -63,8 +62,8 @@ function buildSandboxFileContents(sandboxes, chunkMode) {
     content.addLine('exports.getSandboxMenuItems = getSandboxMenuItems;');
     content.addLine(`function getSandbox(path) {`);
     content.addLine(`switch(path) {`);
-    sandboxes.forEach(({ key, srcPath }, i) => {
-        let fullPath = path_1.join(srcPath, key);
+    sandboxes.forEach(({ key }, i) => {
+        let fullPath = path_1.join(home, key);
         // Normalize slash syntax for Windows/Unix filepaths
         fullPath = slash(fullPath);
         content.addLine(`case '${key}':`);

@@ -1,21 +1,24 @@
-export class StateService {
-    constructor() {
+var StateService = /** @class */ (function () {
+    function StateService() {
+        var _this = this;
         this.filterKey = 'angularPlayground.filter';
         this.filter = sessionStorage.getItem(this.filterKey);
         sessionStorage.removeItem(this.filterKey);
-        const beforeUnload = () => {
-            sessionStorage.setItem(this.filterKey, emptyStringIfNull(this.filter));
+        var beforeUnload = function () {
+            sessionStorage.setItem(_this.filterKey, emptyStringIfNull(_this.filter));
             return 'unload';
         };
         window.addEventListener('beforeunload', beforeUnload);
     }
-    getFilter() {
+    StateService.prototype.getFilter = function () {
         return this.filter;
-    }
-    setFilter(value) {
+    };
+    StateService.prototype.setFilter = function (value) {
         this.filter = value;
-    }
-}
+    };
+    return StateService;
+}());
+export { StateService };
 function emptyStringIfNull(value) {
     return value ? value : '';
 }

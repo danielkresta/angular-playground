@@ -1,21 +1,23 @@
 // https://github.com/gustf/js-levenshtein
-export class LevenshteinDistance {
-    getDistance(a, b) {
+var LevenshteinDistance = /** @class */ (function () {
+    function LevenshteinDistance() {
+    }
+    LevenshteinDistance.prototype.getDistance = function (a, b) {
         if (a === b) {
             return 0;
         }
         if (a.length > b.length) {
-            let tmp = a;
+            var tmp = a;
             a = b;
             b = tmp;
         }
-        let la = a.length;
-        let lb = b.length;
+        var la = a.length;
+        var lb = b.length;
         while (la > 0 && (a.charCodeAt(la - 1) === b.charCodeAt(lb - 1))) {
             la--;
             lb--;
         }
-        let offset = 0;
+        var offset = 0;
         while (offset < la && (a.charCodeAt(offset) === b.charCodeAt(offset))) {
             offset++;
         }
@@ -24,21 +26,20 @@ export class LevenshteinDistance {
         if (la === 0 || lb === 1) {
             return lb;
         }
-        let x;
-        let y;
-        let d0;
-        let d1;
-        let d2;
-        let d3;
-        let dd;
-        let dy;
-        let ay;
-        let bx0;
-        let bx1;
-        let bx2;
-        let bx3;
-        // tslint:disable-next-line:no-bitwise
-        let vector = new Array(la << 1);
+        var x;
+        var y;
+        var d0;
+        var d1;
+        var d2;
+        var d3;
+        var dd;
+        var dy;
+        var ay;
+        var bx0;
+        var bx1;
+        var bx2;
+        var bx3;
+        var vector = new Array(la << 1);
         for (y = 0; y < la;) {
             vector[la + y] = a.charCodeAt(offset + y);
             vector[y] = ++y;
@@ -77,8 +78,8 @@ export class LevenshteinDistance {
             }
         }
         return dd;
-    }
-    minimum(d0, d1, d2, bx, ay) {
+    };
+    LevenshteinDistance.prototype.minimum = function (d0, d1, d2, bx, ay) {
         return d0 < d1 || d2 < d1
             ? d0 > d2
                 ? d2 + 1
@@ -86,6 +87,8 @@ export class LevenshteinDistance {
             : bx === ay
                 ? d1
                 : d1 + 1;
-    }
-}
+    };
+    return LevenshteinDistance;
+}());
+export { LevenshteinDistance };
 //# sourceMappingURL=levenshtein-distance.js.map
