@@ -1,95 +1,102 @@
 {
-  "name": "angular-playground",
-  "version": "5.1.3",
-  "description": "A drop in app module for working on Angular components in isolation (aka Scenario Driven Development).",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "bin": {
-    "angular-playground": "dist/bin/index.js"
-  },
-  "files": [
-    "dist",
-    "schematics"
-  ],
-  "jest": {
-    "transform": {
-      "\\.ts$": "ts-jest"
+    "name": "angular-playground",
+    "version": "6.0.1",
+    "description": "A drop in app module for working on Angular components in isolation (aka Scenario Driven Development).",
+    "main": "dist/index.js",
+    "typings": "dist/index.d.ts",
+    "bin": {
+        "angular-playground": "dist/bin/index.js"
     },
-    "testRegex": "/test/.*\\.spec\\.ts$",
-    "moduleFileExtensions": [
-      "ts",
-      "js",
-      "json"
+    "files": [
+        "dist",
+        "schematics"
     ],
-    "testURL": "http://localhost"
-  },
-  "scripts": {
-    "ngc": "ngc",
-    "build": "npm run app:build && npm run cli:build && npm run schematics:build",
-    "app:build": "gulp build",
-    "cli:build": "tsc -p ./cli/tsconfig.json",
-    "schematics:build": "tsc -p ./schematics/tsconfig.json",
-    "prepublishOnly": "npm run build",
-    "test": "jest"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SoCreate/angular-playground.git"
-  },
-  "keywords": [
-    "angular"
-  ],
-  "author": {
-    "name": "SoCreate",
-    "url": "https://SoCreate.it"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/SoCreate/angular-playground/issues"
-  },
-  "homepage": "http://www.angularplayground.it",
-  "schematics": "./schematics/src/collection.json",
-  "peerDependencies": {
-    "@angular/common": ">=6.0.0",
-    "@angular/compiler": ">=6.0.0",
-    "@angular/core": ">=6.0.0",
-    "@angular/forms": ">=6.0.0",
-    "@angular/platform-browser": ">=6.0.0",
-    "@angular/platform-browser-dynamic": ">=6.0.0",
-    "rxjs": ">=6.0.0",
-    "zone.js": ">=0.8.26"
-  },
-  "dependencies": {
-    "@angular-devkit/core": "^0.7.3",
-    "@angular-devkit/schematics": "^0.7.3",
-    "@schematics/angular": "^0.7.3",
-    "async": "^2.6.0",
-    "chalk": "^2.4.1",
-    "commander": "^2.15.1",
-    "node-watch": "^0.5.8",
-    "puppeteer": "^1.4.0"
-  },
-  "devDependencies": {
-    "@angular/common": "^6.0.0",
-    "@angular/compiler": "^6.0.0",
-    "@angular/compiler-cli": "^6.0.0",
-    "@angular/core": "^6.0.0",
-    "@angular/forms": "^6.0.0",
-    "@angular/platform-browser": "^6.0.0",
-    "@angular/platform-browser-dynamic": "^6.0.0",
-    "@types/jest": "^22.2.3",
-    "@types/node": "^9.3.0",
-    "@types/puppeteer": "^1.3.2",
-    "codelyzer": "~4.2.1",
-    "del": "^3.0.0",
-    "glob": "^7.1.2",
-    "gulp": "^3.9.1",
-    "gulp-inline-ng2-template": "^4.1.0",
-    "jest": "^22.4.3",
-    "rxjs": "^6.0.0",
-    "ts-jest": "^22.4.4",
-    "tslint": "5.9.1",
-    "typescript": "^2.9.2",
-    "zone.js": "0.8.26"
-  }
+    "jest": {
+        "transform": {
+            "\\.ts$": "ts-jest"
+        },
+        "testRegex": ".*\\.spec\\.ts$",
+        "moduleFileExtensions": [
+            "ts",
+            "js",
+            "json"
+        ],
+        "testURL": "http://localhost"
+    },
+    "scripts": {
+        "ngc": "ngc",
+        "build": "npm run app:build && npm run cli:build && npm run schematics:build && npm run copy-jest-files",
+        "app:build": "gulp build",
+        "cli:build": "tsc -p ./cli/tsconfig.json",
+        "schematics:build": "tsc -p ./schematics/tsconfig.json",
+        "prepublishOnly": "npm run build",
+        "test": "jest",
+        "lint": "tslint --project tsconfig.json",
+        "copy-jest-files": "cd dist && mkdir jest && cd .. && copy jest\\* dist\\jest"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SoCreate/angular-playground.git"
+    },
+    "keywords": [
+        "angular"
+    ],
+    "author": {
+        "name": "SoCreate",
+        "url": "https://SoCreate.it"
+    },
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/SoCreate/angular-playground/issues"
+    },
+    "homepage": "http://www.angularplayground.it",
+    "schematics": "./schematics/src/collection.json",
+    "peerDependencies": {
+        "@angular/common": ">=7.0.0",
+        "@angular/compiler": ">=7.0.0",
+        "@angular/core": ">=7.0.0",
+        "@angular/forms": ">=7.0.0",
+        "@angular/platform-browser": ">=7.0.0",
+        "@angular/platform-browser-dynamic": ">=7.0.0",
+        "rxjs": ">=6.0.0",
+        "zone.js": ">=0.8.28"
+    },
+    "dependencies": {
+        "@angular-devkit/core": "^0.8.9",
+        "@angular-devkit/schematics": "^0.8.9",
+        "@jest/core": "^24.8.0",
+        "@jest/types": "^24.8.0",
+        "@schematics/angular": "^0.8.9",
+        "async": "^3.0.1",
+        "chalk": "^2.4.2",
+        "commander": "^2.20.0",
+        "get-port": "^5.0.0",
+        "jest": "^24.8.0",
+        "jest-image-snapshot": "^2.9.0",
+        "jest-puppeteer": "^4.2.0",
+        "node-watch": "^0.6.2",
+        "puppeteer": "^1.17.0"
+    },
+    "devDependencies": {
+        "@angular/common": "^8.0.0",
+        "@angular/compiler": "^8.0.0",
+        "@angular/compiler-cli": "^8.0.0",
+        "@angular/core": "^8.0.0",
+        "@angular/forms": "^8.0.0",
+        "@angular/platform-browser": "^8.0.0",
+        "@angular/platform-browser-dynamic": "^8.0.0",
+        "@types/jest": "^24.0.13",
+        "@types/node": "^12.0.4",
+        "@types/puppeteer": "^1.12.4",
+        "codelyzer": "~5.1.0",
+        "del": "^4.1.1",
+        "glob": "^7.1.4",
+        "gulp": "^4.0.2",
+        "gulp-inline-ng2-template": "^5.0.1",
+        "rxjs": "^6.5.2",
+        "ts-jest": "^24.0.2",
+        "tslint": "5.17.0",
+        "typescript": "~3.4.5",
+        "zone.js": "0.9.1"
+    }
 }

@@ -1,14 +1,10 @@
 import { getSandbox, getSandboxMenuItems } from './sandboxes';
-var SandboxLoader = /** @class */ (function () {
-    function SandboxLoader() {
-    }
-    SandboxLoader.loadSandbox = function (path) {
+export class SandboxLoader {
+    static loadSandbox(path) {
         return getSandbox(path);
-    };
-    SandboxLoader.getSandboxMenuItems = function () {
+    }
+    static getSandboxMenuItems() {
         return getSandboxMenuItems();
-    };
-    return SandboxLoader;
-}());
-export { SandboxLoader };
+    }
+}
 //# sourceMappingURL=sandbox-loader.js.map

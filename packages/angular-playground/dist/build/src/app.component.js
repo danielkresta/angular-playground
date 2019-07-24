@@ -1,3 +1,15 @@
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 import { Component, Inject, QueryList, ViewChildren } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { EventManager } from '@angular/platform-browser';
@@ -9,8 +21,8 @@ import { SandboxLoader } from './shared/sandbox-loader';
 import { MIDDLEWARE } from '../lib/middlewares';
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-var AppComponent = /** @class */ (function () {
-    function AppComponent(stateService, urlService, eventManager, levenshteinDistance, middleware) {
+let AppComponent = class AppComponent {
+    constructor(stateService, urlService, eventManager, levenshteinDistance, middleware) {
         this.stateService = stateService;
         this.urlService = urlService;
         this.eventManager = eventManager;
@@ -22,57 +34,55 @@ var AppComponent = /** @class */ (function () {
         this.filter = new FormControl();
         this.shortcuts = this.getShortcuts();
     }
-    AppComponent.prototype.ngOnInit = function () {
-        var _this = this;
-        var sandboxMenuItems = SandboxLoader.getSandboxMenuItems();
+    ngOnInit() {
+        const sandboxMenuItems = SandboxLoader.getSandboxMenuItems();
         this.middleware
-            .subscribe(function (middleware) { return _this.activeMiddleware = middleware; });
+            .subscribe(middleware => this.activeMiddleware = middleware);
         if (this.urlService.embed) {
             this.selectedSandboxAndScenarioKeys = {
                 sandboxKey: this.urlService.select.sandboxKey,
-                scenarioKey: this.urlService.select.scenarioKey
+                scenarioKey: this.urlService.select.scenarioKey,
             };
         }
         else {
             if (this.urlService.select) {
                 this.selectedSandboxAndScenarioKeys = {
                     sandboxKey: this.urlService.select.sandboxKey,
-                    scenarioKey: this.urlService.select.scenarioKey
+                    scenarioKey: this.urlService.select.scenarioKey,
                 };
             }
             this.eventManager.addGlobalEventListener('window', 'keydown.control.p', this.blockEvent);
             this.eventManager.addGlobalEventListener('window', 'keydown.F2', this.blockEvent);
-            this.eventManager.addGlobalEventListener('window', 'keyup.control.p', function (event) {
-                _this.blockEvent(event);
-                _this.toggleCommandBar();
+            this.eventManager.addGlobalEventListener('window', 'keyup.control.p', (event) => {
+                this.blockEvent(event);
+                this.toggleCommandBar();
             });
-            this.eventManager.addGlobalEventListener('window', 'keyup.F2', function (event) {
-                _this.blockEvent(event);
-                _this.toggleCommandBar();
+            this.eventManager.addGlobalEventListener('window', 'keyup.F2', (event) => {
+                this.blockEvent(event);
+                this.toggleCommandBar();
             });
-            var filterValue = this.stateService.getFilter();
+            let filterValue = this.stateService.getFilter();
             this.totalSandboxes = sandboxMenuItems.length;
             this.filteredSandboxMenuItems = this.filterSandboxes(sandboxMenuItems, filterValue);
             this.findUniqueLabels(sandboxMenuItems);
             this.expandSelectedScenario(this.selectedSandboxAndScenarioKeys);
             this.filter.setValue(filterValue);
             this.filter.valueChanges.pipe(debounceTime(300), distinctUntilChanged())
-                .subscribe(function (value) {
-                _this.stateService.setFilter(value);
-                _this.filteredSandboxMenuItems = _this.filterSandboxes(sandboxMenuItems, value);
-                _this.findUniqueLabels(_this.filteredSandboxMenuItems);
-                console.log(_this.menuCategories);
+                .subscribe(value => {
+                this.stateService.setFilter(value);
+                this.filteredSandboxMenuItems = this.filterSandboxes(sandboxMenuItems, value);
+                this.findUniqueLabels(this.filteredSandboxMenuItems);
+                console.log(this.menuCategories);
                 if (!value) {
                     //this.selectScenario(null, null);
                 }
             });
         }
-    };
-    AppComponent.prototype.onFilterBoxArrowDown = function (event, switchToScenario) {
-        if (switchToScenario === void 0) { switchToScenario = false; }
+    }
+    onFilterBoxArrowDown(event, switchToScenario = false) {
         event.preventDefault();
-        var elementRef;
-        var currentIndex = this.findCurrentScenarioIndex();
+        let elementRef;
+        const currentIndex = this.findCurrentScenarioIndex();
         if (currentIndex) {
             elementRef = this.focusScenarioLinkElement(currentIndex + 1);
         }
@@ -82,12 +92,11 @@ var AppComponent = /** @class */ (function () {
         if (switchToScenario) {
             this.showScenario(elementRef);
         }
-    };
-    AppComponent.prototype.onFilterBoxArrowUp = function (event, switchToScenario) {
-        if (switchToScenario === void 0) { switchToScenario = false; }
+    }
+    onFilterBoxArrowUp(event, switchToScenario = false) {
         event.preventDefault();
-        var elementRef;
-        var currentIndex = this.findCurrentScenarioIndex();
+        let elementRef;
+        const currentIndex = this.findCurrentScenarioIndex();
         if (currentIndex) {
             elementRef = this.focusScenarioLinkElement(currentIndex - 1);
         }
@@ -97,8 +106,8 @@ var AppComponent = /** @class */ (function () {
         if (switchToScenario) {
             this.showScenario(elementRef);
         }
-    };
-    AppComponent.prototype.onScenarioLinkKeyDown = function (scenarioElement, filterElement, event) {
+    }
+    onScenarioLinkKeyDown(scenarioElement, filterElement, event) {
         event.preventDefault();
         switch (event.key) {
             case 'Up':
@@ -112,14 +121,14 @@ var AppComponent = /** @class */ (function () {
             default:
                 if (event.key !== 'Escape' && event.key !== 'Enter') {
                     if (event.key.length === 1) {
-                        this.filter.setValue("" + this.filter.value + event.key);
+                        this.filter.setValue(`${this.filter.value}${event.key}`);
                     }
                     filterElement.focus();
                 }
                 break;
         }
-    };
-    AppComponent.prototype.onScenarioLinkKeyUp = function (scenarioElement, event) {
+    }
+    onScenarioLinkKeyUp(scenarioElement, event) {
         event.preventDefault();
         switch (event.key) {
             case 'Escape':
@@ -129,78 +138,78 @@ var AppComponent = /** @class */ (function () {
                 scenarioElement.click();
                 break;
         }
-    };
-    AppComponent.prototype.onScenarioLinkControlDown = function (scenarioElement, event) {
+    }
+    onScenarioLinkControlDown(scenarioElement, event) {
         if (!this.commandBarActive)
             return;
         event.preventDefault();
-        var elementRef = this.goDown(scenarioElement);
+        let elementRef = this.goDown(scenarioElement);
         this.showScenario(elementRef);
-    };
-    AppComponent.prototype.onScenarioLinkControlUp = function (scenarioElement, event) {
+    }
+    onScenarioLinkControlUp(scenarioElement, event) {
         if (!this.commandBarActive)
             return;
         event.preventDefault();
-        var elementRef = this.goUp(scenarioElement);
+        let elementRef = this.goUp(scenarioElement);
         this.showScenario(elementRef);
-    };
-    AppComponent.prototype.onCommandBarStartPreview = function (event) {
+    }
+    onCommandBarStartPreview(event) {
         event.preventDefault();
         this.commandBarPreview = true;
-    };
-    AppComponent.prototype.onCommandBarStopPreview = function () {
+    }
+    onCommandBarStopPreview() {
         this.commandBarPreview = false;
-    };
-    AppComponent.prototype.onScenarioClick = function (sandboxKey, scenarioKey, event) {
+    }
+    onScenarioClick(sandboxKey, scenarioKey, event) {
         event.stopPropagation();
         event.preventDefault();
         this.selectScenario(sandboxKey, scenarioKey);
-    };
-    AppComponent.prototype.isSelected = function (sandbox, scenario) {
+    }
+    isSelected(sandbox, scenario) {
         return this.selectedSandboxAndScenarioKeys.scenarioKey === scenario.key
             && this.selectedSandboxAndScenarioKeys.sandboxKey.toLowerCase() === sandbox.key.toLowerCase();
-    };
-    AppComponent.prototype.toggleCommandBar = function () {
+    }
+    toggleCommandBar() {
         this.commandBarActive = !this.commandBarActive;
-    };
-    AppComponent.prototype.onCategoryClick = function (category, event) {
+    }
+    onCategoryClick(category, event) {
         event.stopPropagation();
         category.visible = !category.visible;
-    };
-    AppComponent.prototype.onSandboxHeaderClick = function (sandbox, event) {
+    }
+    onSandboxHeaderClick(sandbox, event) {
         event.stopPropagation();
         sandbox.visible = !sandbox.visible;
-    };
-    AppComponent.prototype.onLabelClick = function (event) {
+    }
+    onLabelClick(event) {
         event.stopPropagation();
-    };
-    AppComponent.prototype.onGroupClick = function (group, event) {
+    }
+    onGroupClick(group, event) {
         event.stopPropagation();
         group.visible = !group.visible;
-    };
-    AppComponent.prototype.blockEvent = function (e) {
+    }
+    blockEvent(e) {
         e.preventDefault();
         e.stopPropagation();
-    };
-    AppComponent.prototype.showScenario = function (selectedScenarioElementRef) {
+    }
+    showScenario(selectedScenarioElementRef) {
         if (selectedScenarioElementRef) {
             this.selectScenario(selectedScenarioElementRef.nativeElement.getAttribute('sandboxMenuItemKey'), parseInt(selectedScenarioElementRef.nativeElement.getAttribute('scenarioMenuItemkey'), 10));
         }
-    };
-    AppComponent.prototype.findCurrentScenarioIndex = function () {
-        var currentIndex;
+    }
+    findCurrentScenarioIndex() {
+        let currentIndex;
         if (this.scenarioLinkElements.length > 0) {
-            this.scenarioLinkElements.map(function (element, i) {
+            this.scenarioLinkElements.map((element, i) => {
                 if (element.nativeElement.className.includes('selected')) {
                     currentIndex = i;
                 }
             });
         }
         return currentIndex;
-    };
-    AppComponent.prototype.goUp = function (scenarioElement) {
-        var currentIndex = -1;
-        this.scenarioLinkElements.forEach(function (scenarioElementRef, index) {
+    }
+    goUp(scenarioElement) {
+        let currentIndex = -1;
+        this.scenarioLinkElements.forEach((scenarioElementRef, index) => {
             if (scenarioElementRef.nativeElement === scenarioElement) {
                 currentIndex = index;
             }
@@ -211,10 +220,10 @@ var AppComponent = /** @class */ (function () {
         else {
             return this.focusScenarioLinkElement(currentIndex - 1);
         }
-    };
-    AppComponent.prototype.goDown = function (scenarioElement) {
-        var currentIndex = -1;
-        this.scenarioLinkElements.forEach(function (scenarioElementRef, index) {
+    }
+    goDown(scenarioElement) {
+        let currentIndex = -1;
+        this.scenarioLinkElements.forEach((scenarioElementRef, index) => {
             if (scenarioElementRef.nativeElement === scenarioElement) {
                 currentIndex = index;
             }
@@ -225,22 +234,21 @@ var AppComponent = /** @class */ (function () {
         else {
             return this.focusScenarioLinkElement(currentIndex + 1);
         }
-    };
-    AppComponent.prototype.focusScenarioLinkElement = function (index) {
+    }
+    focusScenarioLinkElement(index) {
         if (this.scenarioLinkElements.toArray()[index]) {
-            var elementRef = this.scenarioLinkElements.toArray()[index];
+            let elementRef = this.scenarioLinkElements.toArray()[index];
             elementRef.nativeElement.focus();
             return elementRef;
         }
-    };
-    AppComponent.prototype.findUniqueLabels = function (sandboxMenuItems) {
-        var _this = this;
+    }
+    findUniqueLabels(sandboxMenuItems) {
         if (sandboxMenuItems == null) {
             return;
         }
-        this.menuCategories = sandboxMenuItems.reduce(function (result, item) {
-            var categoryIndex = result.findIndex(function (obj) { return obj.name === item.label; });
-            var sandboxIndex;
+        this.menuCategories = sandboxMenuItems.reduce((result, item) => {
+            let categoryIndex = result.findIndex(obj => obj.name === item.label);
+            let sandboxIndex;
             if (categoryIndex === -1) {
                 categoryIndex = result.length;
                 sandboxIndex = 0;
@@ -250,7 +258,7 @@ var AppComponent = /** @class */ (function () {
                     sandboxes: [{
                             name: item.name,
                             visible: false,
-                            docsUrl: _this.getDocsUrl(item.label, item.name),
+                            docsUrl: this.getDocsUrl(item.label, item.name),
                             sandboxMenuItem: item,
                             groups: []
                         }]
@@ -261,21 +269,21 @@ var AppComponent = /** @class */ (function () {
                 result[categoryIndex].sandboxes.push({
                     name: item.name,
                     visible: false,
-                    docsUrl: _this.getDocsUrl(item.label, item.name),
+                    docsUrl: this.getDocsUrl(item.label, item.name),
                     sandboxMenuItem: item,
                     groups: []
                 });
             }
-            _this.assignGroups(result[categoryIndex].sandboxes[sandboxIndex]);
+            this.assignGroups(result[categoryIndex].sandboxes[sandboxIndex]);
             return result;
         }, []);
         return;
-    };
-    AppComponent.prototype.getDocsUrl = function (category, component) {
-        var docsFixedPrefix = 'http://sparrow.logex.local/framework-documentation/#!/directives/';
-        var componentRegex = /Component/gi;
-        var pipeRegex = /Pipe/gi;
-        var directiveRegex = /Directive/gi;
+    }
+    getDocsUrl(category, component) {
+        const docsFixedPrefix = 'http://sparrow.logex.local/framework-documentation/#!/directives/';
+        const componentRegex = /Component/gi;
+        const pipeRegex = /Pipe/gi;
+        const directiveRegex = /Directive/gi;
         component = component
             .replace(componentRegex, '')
             .replace(pipeRegex, '')
@@ -283,20 +291,19 @@ var AppComponent = /** @class */ (function () {
             .split(/(?=[A-Z])/)
             .join("-").toLowerCase();
         return docsFixedPrefix + category.toLowerCase() + '/' + component;
-    };
-    AppComponent.prototype.assignGroups = function (sandbox) {
-        var groupsRegex = /\s*([^;]+)(?:[;,]\s*subgroup:([^;]+))?/;
-        var group;
-        var description;
-        sandbox.sandboxMenuItem.scenarioMenuItems.forEach(function (item) {
-            var _a;
+    }
+    assignGroups(sandbox) {
+        const groupsRegex = /\s*([^;]+)(?:[;,]\s*subgroup:([^;]+))?/;
+        let group;
+        let description;
+        sandbox.sandboxMenuItem.scenarioMenuItems.forEach(item => {
             // String expected to contain encoded group and description
-            _a = groupsRegex.exec(item.description), description = _a[1], group = _a[2];
+            [, description, group] = groupsRegex.exec(item.description);
             // reset regex
             groupsRegex.lastIndex = 0;
             group = group === undefined ? 'default' : group;
             // Find if group already exists in the list
-            var groupIndex = sandbox.groups.findIndex(function (obj) { return obj.name === group; });
+            let groupIndex = sandbox.groups.findIndex(obj => obj.name === group);
             if (groupIndex === -1) {
                 groupIndex = sandbox.groups.length;
                 sandbox.groups.push({
@@ -316,81 +323,80 @@ var AppComponent = /** @class */ (function () {
             }
         });
         return;
-    };
-    AppComponent.prototype.filterSandboxes = function (sandboxMenuItems, filter) {
-        var _this = this;
+    }
+    filterSandboxes(sandboxMenuItems, filter) {
         if (!filter) {
-            return sandboxMenuItems.map(function (item, i) { return Object.assign({}, item, { tabIndex: i }); });
+            return sandboxMenuItems.map((item, i) => Object.assign({}, item, { tabIndex: i }));
         }
-        var tabIndex = 0;
-        var filterNormalized = filter.toLowerCase();
+        let tabIndex = 0;
+        let filterNormalized = filter.toLowerCase();
         return sandboxMenuItems
-            .reduce(function (accum, curr) {
-            var searchKeyNormalized = curr.searchKey.toLowerCase();
-            var indexMatches = fuzzySearch(filterNormalized, searchKeyNormalized);
+            .reduce((accum, curr) => {
+            let searchKeyNormalized = curr.searchKey.toLowerCase();
+            let indexMatches = fuzzySearch(filterNormalized, searchKeyNormalized);
             if (indexMatches) {
-                var weight = _this.levenshteinDistance.getDistance(filterNormalized, searchKeyNormalized);
-                return accum.concat([Object.assign({}, curr, { weight: weight, indexMatches: indexMatches })]);
+                let weight = this.levenshteinDistance.getDistance(filterNormalized, searchKeyNormalized);
+                return [...accum, Object.assign({}, curr, { weight, indexMatches })];
             }
             else {
                 return accum;
             }
         }, [])
-            .sort(function (a, b) {
+            .sort((a, b) => {
             return a.weight - b.weight;
         })
-            .map(function (sandboxMenuItem) { return Object.assign({}, sandboxMenuItem, { tabIndex: tabIndex++ }); });
-    };
-    AppComponent.prototype.selectScenario = function (sandboxKey, scenarioKey) {
-        this.selectedSandboxAndScenarioKeys = { sandboxKey: sandboxKey, scenarioKey: scenarioKey };
+            .map(sandboxMenuItem => Object.assign({}, sandboxMenuItem, { tabIndex: tabIndex++ }));
+    }
+    selectScenario(sandboxKey, scenarioKey) {
+        this.selectedSandboxAndScenarioKeys = { sandboxKey, scenarioKey };
         this.urlService.setSelected(sandboxKey, scenarioKey);
-    };
-    AppComponent.prototype.getShortcuts = function () {
+    }
+    getShortcuts() {
         return [
             {
                 keys: ['ctrl + p', 'f2'],
-                description: 'Toggle command bar open/closed'
+                description: 'Toggle command bar open/closed',
             },
             {
                 keys: ['esc'],
-                description: 'Close command bar'
+                description: 'Close command bar',
             },
             {
                 keys: ['\u2191', '\u2193'],
-                description: 'Navigate up or down in command bar list'
+                description: 'Navigate up or down in command bar list',
             },
             {
                 keys: ['ctrl + \u2191', 'ctrl + \u2193'],
-                description: 'Switch scenarios while navigating up or down in command bar list'
-            }
+                description: 'Switch scenarios while navigating up or down in command bar list',
+            },
         ];
-    };
-    AppComponent.prototype.expandSelectedScenario = function (selected) {
+    }
+    expandSelectedScenario(selected) {
         if (selected.sandboxKey == null && selected.scenarioKey == null) {
             return;
         }
-        var index;
+        let index;
         index = this.findItemByKey(selected.sandboxKey, selected.scenarioKey);
         this.menuCategories[index.categoryIndex].visible = true;
         this.menuCategories[index.categoryIndex].sandboxes[index.sandboxIndex].visible = true;
         this.menuCategories[index.categoryIndex].sandboxes[index.sandboxIndex].groups[index.groupIndex].visible = true;
         return;
-    };
-    AppComponent.prototype.findItemByKey = function (sandboxKey, scenarioKey) {
-        var categoryIndex = null;
-        var sandboxIndex = null;
-        var groupIndex = null;
-        var scenarioIndex = null;
+    }
+    findItemByKey(sandboxKey, scenarioKey) {
+        let categoryIndex = null;
+        let sandboxIndex = null;
+        let groupIndex = null;
+        let scenarioIndex = null;
         for (categoryIndex = 0; categoryIndex < this.menuCategories.length; categoryIndex++) {
-            sandboxIndex = this.menuCategories[categoryIndex].sandboxes.findIndex(function (obj) { return obj.sandboxMenuItem.key === sandboxKey; });
+            sandboxIndex = this.menuCategories[categoryIndex].sandboxes.findIndex(obj => obj.sandboxMenuItem.key === sandboxKey);
             if (sandboxIndex > -1) {
                 break;
             }
         }
         if (scenarioKey != null) {
-            var groups = this.menuCategories[categoryIndex].sandboxes[sandboxIndex].groups;
+            const groups = this.menuCategories[categoryIndex].sandboxes[sandboxIndex].groups;
             for (groupIndex = 0; groupIndex < this.menuCategories.length; groupIndex++) {
-                scenarioIndex = groups[groupIndex].scenarios.findIndex(function (obj) { return obj.scenarioMenuItem.key === scenarioKey; });
+                scenarioIndex = groups[groupIndex].scenarios.findIndex(obj => obj.scenarioMenuItem.key === scenarioKey);
                 if (scenarioIndex > -1) {
                     break;
                 }
@@ -402,26 +408,541 @@ var AppComponent = /** @class */ (function () {
             groupIndex: groupIndex,
             scenarioIndex: scenarioIndex
         };
-    };
-    AppComponent.decorators = [
-        { type: Component, args: [{
-                    selector: 'ap-root',
-                    template: "\n      <!--\n      <div class=\"shield\" *ngIf=\"commandBarActive\" (click)=\"toggleCommandBar()\"></div>\n      -->\n      <div class=\"command-bar command-bar--open\" *ngIf=\"filteredSandboxMenuItems\"\n           (keydown.control)=\"onCommandBarStartPreview($event)\"\n           (keyup.control)=\"onCommandBarStopPreview()\"\n           [class.command-bar--preview]=\"commandBarPreview\">\n          <input\n              class=\"command-bar__filter\"\n              type=\"text\"\n              name=\"filter\"\n              placeholder=\"search...\"\n              [formControl]=\"filter\"\n              #filterElement\n              (keydown.arrowup)=\"onFilterBoxArrowUp($event)\"\n              (keydown.arrowdown)=\"onFilterBoxArrowDown($event)\"\n              (keydown.control.arrowup)=\"onFilterBoxArrowUp($event, true)\"\n              (keydown.control.arrowdown)=\"onFilterBoxArrowDown($event, true)\">\n          <div class=\"command-bar__categories\">\n              <div\n                  class=\"command-bar__category\"\n                  *ngFor=\"let category of menuCategories; index as categoryIndex\">\n                  <div\n                      class=\"command-bar__category__title\"\n                      *ngIf=\"filteredSandboxMenuItems && filteredSandboxMenuItems.length > 0\">\n                      <span (click)=\"onCategoryClick(category, $event)\"\n                          class=\"command-bar__category__name\">\n                          {{category.name}}\n                      </span>\n                  </div>\n                  <div *ngIf=\"filteredSandboxMenuItems && filteredSandboxMenuItems.length > 0\n                              && category.visible\"\n                      class=\"command-bar__sandboxes\">\n                      <ng-container *ngFor=\"let sandbox of category.sandboxes; index as sandboxIndex\">\n                          <div class=\"command-bar__sandbox\"\n                              (click)=\"onSandboxHeaderClick(sandbox, $event)\">\n                              <h2 class=\"command-bar__title\" title=\"{{category.name}} {{sandbox.name}}\"\n                                  [class.command-bar__sandbox-title--selected]=\"selectedSandboxAndScenarioKeys.sandboxKey === sandbox.sandboxMenuItem.key\">\n                                  <span class=\"command-bar__name\"\n                                      [innerHtml]=\"sandbox.name | apHighlightSearchMatch : sandbox.sandboxMenuItem.indexMatches\"></span>\n                                  <a\n                                      class=\"command-bar__label\"\n                                      [href]=\"sandbox.docsUrl\"\n                                      target=\"_blank\"\n                                      (click)=onLabelClick($event)>\n                                      doc\n                                  </a>\n                              </h2>\n                              <ng-container\n                                  *ngIf=\"sandbox.visible\">\n                                  <div \n                                      class=\"command-bar__sandbox__groups\"\n                                      *ngFor=\"let group of sandbox.groups; index as groupIndex\">\n                                      <div\n                                          class=\"command-bar__sandbox__group\"\n                                          (click)=\"onGroupClick(group, $event)\"\n                                          *ngIf=\"sandbox.groups.length > 1\n                                              || ( sandbox.groups.length === 1 && group.name !== 'default' ) \">\n                                          <span\n                                              class=\"command-bar__sandbox__group__title\">\n                                              {{group.name}}\n                                          </span>\n                                      </div>\n                                      <div class=\"command-bar__scenarios\"\n                                          *ngIf=\"group.visible || ( sandbox.groups.length === 1 && group.name === 'default' )\">\n                                          <ng-container\n                                              *ngFor=\"let scenario of group.scenarios; index as scenarioIndex\">\n                                              <a\n                                                  class=\"command-bar__scenario-link\"\n                                                  #scenarioElement\n                                                  [tabindex]=\"scenario.scenarioMenuItem.tabIndex\"\n                                                  [attr.sandboxMenuItemKey]=\"sandbox.sandboxMenuItem.key\"\n                                                  [attr.scenarioMenuItemkey]=\"scenario.scenarioMenuItem.key\"\n                                                  (keydown.control.arrowup)=\"onScenarioLinkControlUp(scenarioElement, $event)\"\n                                                  (keydown.control.arrowdown)=\"onScenarioLinkControlDown(scenarioElement, $event)\"\n                                                  (keydown.arrowup)=\"onScenarioLinkKeyDown(scenarioElement, filterElement, $event)\"\n                                                  (keydown.arrowdown)=\"onScenarioLinkKeyDown(scenarioElement, filterElement, $event)\"\n                                                  (keydown.esc)=\"onScenarioLinkKeyDown(scenarioElement, filterElement, $event)\"\n                                                  (keydown.enter)=\"onScenarioLinkKeyDown(scenarioElement, filterElement, $event)\"\n                                                  (keyup.esc)=\"onScenarioLinkKeyUp(scenarioElement, $event)\"\n                                                  (keyup.enter)=\"onScenarioLinkKeyUp(scenarioElement, $event)\"\n                                                  (click)=\"onScenarioClick(sandbox.sandboxMenuItem.key, scenario.scenarioMenuItem.key, $event); toggleCommandBar()\"\n                                                  [class.command-bar__scenario-link--selected]=\"isSelected(sandbox.sandboxMenuItem, scenario.scenarioMenuItem)\">\n                                                  <ap-pin [selected]=\"isSelected(sandbox.sandboxMenuItem, scenario.scenarioMenuItem)\"></ap-pin>\n                                                  <span class=\"command-bar__scenario-label\">\n                                                      {{scenario.name}}\n                                                  </span>\n                                              </a>\n                                          </ng-container>\n                                      </div>\n                                  </div>\n                              </ng-container>\n                          </div>\n                      </ng-container>\n                  </div>\n              </div>\n          </div>\n          <a *ngIf=\"filteredSandboxMenuItems && filteredSandboxMenuItems.length > 0\" class=\"command-bar__brand\"\n             href=\"http://www.angularplayground.it/\" target=\"_blank\">\n              <ap-logo></ap-logo>\n          </a>\n      </div>\n      <section class=\"content\">\n          <ap-drawer *ngIf=\"activeMiddleware.overlay\" (openCommandBarClick)=\"toggleCommandBar()\" [class.content__menu--hide]=\"commandBarActive\" class=\"content__menu\"></ap-drawer>\n          <div class=\"content__none\" *ngIf=\"!selectedSandboxAndScenarioKeys.sandboxKey\">\n              <div class=\"content__none-message\">\n                  <p *ngIf=\"totalSandboxes > 0\">\n                      The playground has {{totalSandboxes}} sandboxed component{{totalSandboxes > 1 ? 's' : ''}}\n                  </p>\n                  <p *ngIf=\"totalSandboxes === 0\">\n                      Get started - create your first sandbox! <a href=\"http://www.angularplayground.it/docs/how-to/sandboxing-components\" target=\"_blank\">Click here</a>.\n                  </p>\n                  <!--\n                  <div class=\"content__shortcuts\">\n                      <div class=\"content__shortcut\" *ngFor=\"let shortcut of shortcuts\">\n                          <div class=\"content__shortcut-label\">\n                              <ng-container *ngFor=\"let key of shortcut.keys; let i = index\">\n                                  <code>\n                                      {{key}}\n                                  </code>\n                                  <ng-container *ngIf=\"shortcut.keys.length > 1 && i < shortcut.keys.length - 1\">&nbsp;&nbsp;/&nbsp;&nbsp;</ng-container>\n                              </ng-container>\n                          </div>\n                          <div class=\"content__shortcut-value\">\n                              {{shortcut.description}}\n                          </div>\n                      </div>\n                  </div>\n              -->\n              </div>\n          </div>\n          <ng-container *ngIf=\"selectedSandboxAndScenarioKeys.sandboxKey\">\n              <ap-scenario [selectedSandboxAndScenarioKeys]=\"selectedSandboxAndScenarioKeys\"></ap-scenario>\n          </ng-container>\n      </section>\n    ",
-                    styles: ["\n          /* Globals */\n          * {\n            box-sizing: border-box;\n          }\n\n          :host {\n            display: flex;\n            flex-direction: row;\n            justify-content: flex-start;\n          }\n\n          /* Shield */\n          .shield {\n            height: 100vh;\n            opacity: 0;\n            position: absolute;\n            z-index: 2;\n            width: 100%;\n          }\n\n          /* Command Bar */\n          .command-bar {\n            background-color: #252526;\n            box-shadow: 0 3px 8px 5px black;\n            color: white;\n            display: flex;\n            flex-direction: column;\n            font-family: Consolas, monospace;\n            left: 188px;\n            margin-right: 10px;\n            margin-top: -6px;\n            padding-top: 10px;\n            position: relative;\n            transform: translate(-50%, -120%);\n            transition: transform ease 100ms, opacity ease 100ms;\n            width: 376px;\n            /*\n            z-index: 9999999999999;\n            */\n          }\n\n          .command-bar::before {\n            border-bottom: solid 1px black;\n            content: \"\";\n            display: block;\n            position: relative;\n            top: 52px;\n            width: 100%;\n          }\n\n          .command-bar--open {\n            min-height: 60px;\n            transform: translate(-50%, 0);\n          }\n\n          .command-bar--preview {\n            opacity: .7;\n          }\n\n          .command-bar__filter {\n            background-color: #3c3c3c;\n            border: 1px solid #174a6c;\n            color: white;\n            font-family: Consolas, monospace;\n            font-size: 16px;\n            margin: 6px 0 10px 5px;\n            padding: 8px;\n            width: 365px;\n            z-index: 1;\n          }\n\n          .command-bar__filter::placeholder {\n            color: #a9a9a9;\n          }\n\n          .command-bar__filter:-ms-input-placeholder {\n            color: #a9a9a9;\n          }\n\n          .command-bar__filter::-moz-focus-inner {\n            border: 0;\n            padding: 0;\n          }\n\n          /* Categories */\n          .command-bar__categories {\n              overflow: auto;\n              max-height: calc(100vh - 109px);\n          }\n\n          .command-bar__categories::-webkit-scrollbar {\n              background-color: transparent;\n              width: 6px;\n          }\n  \n            .command-bar__categories::-webkit-scrollbar-track {\n              border-left: solid 1px black;\n              background: rgba(255, 255, 255, 0.1);\n          }\n  \n            .command-bar__categories::-webkit-scrollbar-thumb  {\n              background-color: rgba(255, 255, 255, 0.1);\n              margin-left: 2px;\n              width: 4px;\n          }\n\n          .command-bar__category {\n              margin-top: 9px;\n          }\n\n          .command-bar__category__title {\n              padding: 5px;\n          }\n\n          .command-bar__category__name {\n              color: rgba(255, 255, 255, .8);\n              font-family: Consolas, monospace;\n              font-size: 16px;\n              margin: 0;\n          }\n\n          .command-bar__category__name:hover,\n          .command-bar__category__name:active,\n          .command-bar__category__name:focus {\n            opacity: 0.8;\n            outline-style: none;\n            cursor: pointer;\n          }\n\n          /* Sandboxes */\n          .command-bar__sandboxes {\n            border-top: solid 1px rgba(255, 255, 255, .1);\n            /*overflow: auto;*/\n            position: relative;\n          }\n\n          .command-bar__sandbox {\n            border-bottom: solid 1px black;\n            border-top: solid 1px rgba(255, 255, 255, .1);\n            padding: 8px 6px 4px;\n          }\n    \n          .command-bar__sandbox:hover,\n          .command-bar__sandbox:active,\n          .command-bar__sandbox:focus {\n            background-color: #202020;\n            color: white;\n            outline-style: none;\n            cursor: default;\n          }\n\n          .command-bar__sandbox:first-child {\n            border-top: none;\n          }\n\n          .command-bar__sandbox:last-child {\n            border-bottom: none;\n            padding-bottom: 3px;\n          }\n\n          .command-bar__title {\n            /*align-items: center;*/\n            color: rgba(255, 255, 255, .6);\n            display: flex;\n            font-family: Consolas, monospace;\n            font-size: 12px;\n            font-weight: normal;\n            justify-content: space-between;\n            margin: 0;\n            padding: 5px 0 0;\n          }\n\n          .command-bar__title ::ng-deep mark {\n            background: transparent;\n            color: #0097fb;\n            font-weight: bold;\n          }\n\n          .command-bar__name {\n            max-width: 100%;\n            overflow: hidden;\n            text-overflow: ellipsis;\n            white-space: nowrap;\n          }\n\n          .command-bar__label {\n            background: rgba(255, 255, 255, .1);\n            border-radius: 2px;\n            display: block;\n            font-size: 10px;\n            margin-left: 10px;\n            padding: 4px 5px 3px;\n            text-decoration: none;\n            color: #3195bf;\n            border: solid 1px #252526;\n          }\n\n          .command-bar__label:hover,\n          .command-bar__label:active,\n          .command-bar__label:focus {\n            opacity: 0.9;\n            outline-style: none;\n            border: solid 1px #666666;\n          }\n\n          /* Scenario Groups */\n\n          .command-bar__sandbox__group {\n              padding: 3px 10px 3px 3px;\n              display: inline-block;\n          }\n\n          .command-bar__sandbox__group__title {\n              color: rgba(255, 255, 255, .4);\n              font-family: Consolas, monospace;\n              font-size: 12px;\n              margin: 0;\n          }\n\n          .command-bar__sandbox__group__title:hover,\n          .command-bar__sandbox__group__title:active,\n          .command-bar__sandbox__group__title:focus {\n              opacity: 0.8;\n              outline-style: none;\n              cursor: pointer;\n          }\n\n          .command-bar__sandbox__groups{\n              margin: 3px;\n          }\n\n          /* Scenarios */\n          .command-bar__scenarios {\n            /*\n            display: flex;\n            */\n          }\n\n          .command-bar__scenario-link {\n            align-items: center;\n            border-radius: 2px;\n            color: rgba(255, 255, 255, .5);\n            cursor: pointer;\n            display: flex;\n            padding: 4px 3px;\n            width: 100%;\n          }\n\n          .command-bar__scenario-link:hover,\n          .command-bar__scenario-link:active,\n          .command-bar__scenario-link:focus {\n            background-color: #0097fb;\n            color: white;\n            outline-style: none;\n          }\n\n          .command-bar__scenario-link:hover .command-bar__scenario-icon,\n          .command-bar__scenario-link:active .command-bar__scenario-icon,\n          .command-bar__scenario-link:focus .command-bar__scenario-icon {\n            opacity: .5;\n          }\n\n          .command-bar__scenario-label {\n            line-height: 1;\n            max-width: calc(100% - 26px);\n            min-width: calc(100% - 26px);\n            padding-bottom: 2px;\n          }\n\n          .command-bar__scenario-link--selected {\n            background: rgba(255, 255, 255, .1);\n            color: white;\n          }\n\n          .command-bar__scenario-link:hover .command-bar__scenario-icon--selected,\n          .command-bar__scenario-link:active .command-bar__scenario-icon--selected,\n          .command-bar__scenario-link:focus .command-bar__scenario-icon--selected {\n            fill: white;\n          }\n\n          /* Brand */\n          .command-bar__brand {\n            border-top: solid 1px black;\n            display: block;\n            position: relative;\n            padding: 9px 0 3px;\n            text-align: center;\n          }\n\n          .command-bar__brand::before {\n            border-bottom: solid 1px rgba(255, 255, 255, .1);\n            content: \"\";\n            display: block;\n            left: 0;\n            position: absolute;\n            top: 0;\n            width: 100%;\n          }\n\n          .command-bar__brand:hover .command-bar__logo__box {\n            fill: rgba(255, 255, 255, .2);\n          }\n\n          .command-bar__brand:hover .command-bar__logo__letter {\n            fill: rgba(255, 255, 255, .75);\n          }\n\n          /* Content */\n          .content {\n              display: flex;\n              height: 100vh;\n          }\n\n\n          .content__none {\n            /*\n            align-items: center;\n            */\n            border: 0;\n            display: flex;\n            min-height: calc(100vh - 4em);\n            justify-content: center;\n            padding-top: 2em;\n            padding-bottom: 2em;\n            position: relative;\n            width: 100%;\n          }\n\n          .content__none-message {\n            font-family: Arial, sans-serif;\n            max-width: 50%;\n            min-width: 450px;\n            text-align: center;\n          }\n\n          .content__none-message em {\n            color: #666;\n          }\n\n          .content__none-message p {\n            font-size: 20px;\n          }\n\n          .content__shortcuts {\n            border-top: solid 1px #ccc;\n            margin-top: 2em;\n            padding: 30px 0 0 100px;\n            width: 520px;\n          }\n\n          .content__shortcut {\n            display: flex;\n          }\n\n          .content__shortcut-label {\n            align-items: center;\n            display: flex;\n            font-size: 11px;\n            justify-content: flex-end;\n            max-width: 150px;\n            min-width: 150px;\n            padding: 8px 12px 8px 0;\n            white-space: nowrap;\n          }\n\n          .content__shortcut-label code {\n            background: #eee;\n            border: solid 1px #ccc;\n            border-radius: 4px;\n            padding: 3px 7px;\n          }\n\n          .content__shortcut-value {\n            align-items: center;\n            display: flex;\n            font-size: 11px;\n            line-height: 1.75;\n            text-align: left;\n            white-space: nowrap;\n          }\n    "]
-                },] },
-    ];
-    /** @nocollapse */
-    AppComponent.ctorParameters = function () { return [
-        { type: StateService },
-        { type: UrlService },
-        { type: EventManager },
-        { type: LevenshteinDistance },
-        { type: Observable, decorators: [{ type: Inject, args: [MIDDLEWARE,] }] }
-    ]; };
-    AppComponent.propDecorators = {
-        scenarioLinkElements: [{ type: ViewChildren, args: ['scenarioElement',] }]
-    };
-    return AppComponent;
-}());
+    }
+};
+__decorate([
+    ViewChildren('scenarioElement'),
+    __metadata("design:type", QueryList)
+], AppComponent.prototype, "scenarioLinkElements", void 0);
+AppComponent = __decorate([
+    Component({
+        selector: 'ap-root',
+        template: `
+      <!--
+      <div class="shield" *ngIf="commandBarActive" (click)="toggleCommandBar()"></div>
+      -->
+      <div class="command-bar command-bar--open" *ngIf="filteredSandboxMenuItems"
+           (keydown.control)="onCommandBarStartPreview($event)"
+           (keyup.control)="onCommandBarStopPreview()"
+           [class.command-bar--preview]="commandBarPreview">
+          <input
+              class="command-bar__filter"
+              type="text"
+              name="filter"
+              placeholder="search..."
+              [formControl]="filter"
+              #filterElement
+              (keydown.arrowup)="onFilterBoxArrowUp($event)"
+              (keydown.arrowdown)="onFilterBoxArrowDown($event)"
+              (keydown.control.arrowup)="onFilterBoxArrowUp($event, true)"
+              (keydown.control.arrowdown)="onFilterBoxArrowDown($event, true)">
+          <div class="command-bar__categories">
+              <div
+                  class="command-bar__category"
+                  *ngFor="let category of menuCategories; index as categoryIndex">
+                  <div
+                      class="command-bar__category__title"
+                      *ngIf="filteredSandboxMenuItems && filteredSandboxMenuItems.length > 0">
+                      <span (click)="onCategoryClick(category, $event)"
+                          class="command-bar__category__name">
+                          {{category.name}}
+                      </span>
+                  </div>
+                  <div *ngIf="filteredSandboxMenuItems && filteredSandboxMenuItems.length > 0
+                              && category.visible"
+                      class="command-bar__sandboxes">
+                      <ng-container *ngFor="let sandbox of category.sandboxes; index as sandboxIndex">
+                          <div class="command-bar__sandbox"
+                              (click)="onSandboxHeaderClick(sandbox, $event)">
+                              <h2 class="command-bar__title" title="{{category.name}} {{sandbox.name}}"
+                                  [class.command-bar__sandbox-title--selected]="selectedSandboxAndScenarioKeys.sandboxKey === sandbox.sandboxMenuItem.key">
+                                  <span class="command-bar__name"
+                                      [innerHtml]="sandbox.name | apHighlightSearchMatch : sandbox.sandboxMenuItem.indexMatches"></span>
+                                  <a
+                                      class="command-bar__label"
+                                      [href]="sandbox.docsUrl"
+                                      target="_blank"
+                                      (click)=onLabelClick($event)>
+                                      doc
+                                  </a>
+                              </h2>
+                              <ng-container
+                                  *ngIf="sandbox.visible">
+                                  <div 
+                                      class="command-bar__sandbox__groups"
+                                      *ngFor="let group of sandbox.groups; index as groupIndex">
+                                      <div
+                                          class="command-bar__sandbox__group"
+                                          (click)="onGroupClick(group, $event)"
+                                          *ngIf="sandbox.groups.length > 1
+                                              || ( sandbox.groups.length === 1 && group.name !== 'default' ) ">
+                                          <span
+                                              class="command-bar__sandbox__group__title">
+                                              {{group.name}}
+                                          </span>
+                                      </div>
+                                      <div class="command-bar__scenarios"
+                                          *ngIf="group.visible || ( sandbox.groups.length === 1 && group.name === 'default' )">
+                                          <ng-container
+                                              *ngFor="let scenario of group.scenarios; index as scenarioIndex">
+                                              <a
+                                                  class="command-bar__scenario-link"
+                                                  #scenarioElement
+                                                  [tabindex]="scenario.scenarioMenuItem.tabIndex"
+                                                  [attr.sandboxMenuItemKey]="sandbox.sandboxMenuItem.key"
+                                                  [attr.scenarioMenuItemkey]="scenario.scenarioMenuItem.key"
+                                                  (keydown.control.arrowup)="onScenarioLinkControlUp(scenarioElement, $event)"
+                                                  (keydown.control.arrowdown)="onScenarioLinkControlDown(scenarioElement, $event)"
+                                                  (keydown.arrowup)="onScenarioLinkKeyDown(scenarioElement, filterElement, $event)"
+                                                  (keydown.arrowdown)="onScenarioLinkKeyDown(scenarioElement, filterElement, $event)"
+                                                  (keydown.esc)="onScenarioLinkKeyDown(scenarioElement, filterElement, $event)"
+                                                  (keydown.enter)="onScenarioLinkKeyDown(scenarioElement, filterElement, $event)"
+                                                  (keyup.esc)="onScenarioLinkKeyUp(scenarioElement, $event)"
+                                                  (keyup.enter)="onScenarioLinkKeyUp(scenarioElement, $event)"
+                                                  (click)="onScenarioClick(sandbox.sandboxMenuItem.key, scenario.scenarioMenuItem.key, $event); toggleCommandBar()"
+                                                  [class.command-bar__scenario-link--selected]="isSelected(sandbox.sandboxMenuItem, scenario.scenarioMenuItem)">
+                                                  <ap-pin [selected]="isSelected(sandbox.sandboxMenuItem, scenario.scenarioMenuItem)"></ap-pin>
+                                                  <span class="command-bar__scenario-label">
+                                                      {{scenario.name}}
+                                                  </span>
+                                              </a>
+                                          </ng-container>
+                                      </div>
+                                  </div>
+                              </ng-container>
+                          </div>
+                      </ng-container>
+                  </div>
+              </div>
+          </div>
+          <a *ngIf="filteredSandboxMenuItems && filteredSandboxMenuItems.length > 0" class="command-bar__brand"
+             href="http://www.angularplayground.it/" target="_blank">
+              <ap-logo></ap-logo>
+          </a>
+      </div>
+      <section class="content">
+          <ap-drawer *ngIf="activeMiddleware.overlay" (openCommandBarClick)="toggleCommandBar()" [class.content__menu--hide]="commandBarActive" class="content__menu"></ap-drawer>
+          <div class="content__none" *ngIf="!selectedSandboxAndScenarioKeys.sandboxKey">
+              <div class="content__none-message">
+                  <p *ngIf="totalSandboxes > 0">
+                      The playground has {{totalSandboxes}} sandboxed component{{totalSandboxes > 1 ? 's' : ''}}
+                  </p>
+                  <p *ngIf="totalSandboxes === 0">
+                      Get started - create your first sandbox! <a href="http://www.angularplayground.it/docs/how-to/sandboxing-components" target="_blank">Click here</a>.
+                  </p>
+                  <!--
+                  <div class="content__shortcuts">
+                      <div class="content__shortcut" *ngFor="let shortcut of shortcuts">
+                          <div class="content__shortcut-label">
+                              <ng-container *ngFor="let key of shortcut.keys; let i = index">
+                                  <code>
+                                      {{key}}
+                                  </code>
+                                  <ng-container *ngIf="shortcut.keys.length > 1 && i < shortcut.keys.length - 1">&nbsp;&nbsp;/&nbsp;&nbsp;</ng-container>
+                              </ng-container>
+                          </div>
+                          <div class="content__shortcut-value">
+                              {{shortcut.description}}
+                          </div>
+                      </div>
+                  </div>
+              -->
+              </div>
+          </div>
+          <ng-container *ngIf="selectedSandboxAndScenarioKeys.sandboxKey">
+              <ap-scenario [selectedSandboxAndScenarioKeys]="selectedSandboxAndScenarioKeys"></ap-scenario>
+          </ng-container>
+      </section>
+    `,
+        styles: [`
+          /* Globals */
+          * {
+            box-sizing: border-box;
+          }
+
+          :host {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+          }
+
+          /* Shield */
+          .shield {
+            height: 100vh;
+            opacity: 0;
+            position: absolute;
+            z-index: 2;
+            width: 100%;
+          }
+
+          /* Command Bar */
+          .command-bar {
+            background-color: #252526;
+            box-shadow: 0 3px 8px 5px black;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            font-family: Consolas, monospace;
+            left: 188px;
+            margin-right: 10px;
+            margin-top: -6px;
+            padding-top: 10px;
+            position: relative;
+            transform: translate(-50%, -120%);
+            transition: transform ease 100ms, opacity ease 100ms;
+            width: 376px;
+            /*
+            z-index: 9999999999999;
+            */
+          }
+
+          .command-bar::before {
+            border-bottom: solid 1px black;
+            content: "";
+            display: block;
+            position: relative;
+            top: 52px;
+            width: 100%;
+          }
+
+          .command-bar--open {
+            min-height: 60px;
+            transform: translate(-50%, 0);
+          }
+
+          .command-bar--preview {
+            opacity: .7;
+          }
+
+          .command-bar__filter {
+            background-color: #3c3c3c;
+            border: 1px solid #174a6c;
+            color: white;
+            font-family: Consolas, monospace;
+            font-size: 16px;
+            margin: 6px 0 10px 5px;
+            padding: 8px;
+            width: 365px;
+            z-index: 1;
+          }
+
+          .command-bar__filter::placeholder {
+            color: #a9a9a9;
+          }
+
+          .command-bar__filter:-ms-input-placeholder {
+            color: #a9a9a9;
+          }
+
+          .command-bar__filter::-moz-focus-inner {
+            border: 0;
+            padding: 0;
+          }
+
+          /* Categories */
+          .command-bar__categories {
+              overflow: auto;
+              max-height: calc(100vh - 109px);
+          }
+
+          .command-bar__categories::-webkit-scrollbar {
+              background-color: transparent;
+              width: 6px;
+          }
+  
+            .command-bar__categories::-webkit-scrollbar-track {
+              border-left: solid 1px black;
+              background: rgba(255, 255, 255, 0.1);
+          }
+  
+            .command-bar__categories::-webkit-scrollbar-thumb  {
+              background-color: rgba(255, 255, 255, 0.1);
+              margin-left: 2px;
+              width: 4px;
+          }
+
+          .command-bar__category {
+              margin-top: 9px;
+          }
+
+          .command-bar__category__title {
+              padding: 5px;
+          }
+
+          .command-bar__category__name {
+              color: rgba(255, 255, 255, .8);
+              font-family: Consolas, monospace;
+              font-size: 16px;
+              margin: 0;
+          }
+
+          .command-bar__category__name:hover,
+          .command-bar__category__name:active,
+          .command-bar__category__name:focus {
+            opacity: 0.8;
+            outline-style: none;
+            cursor: pointer;
+          }
+
+          /* Sandboxes */
+          .command-bar__sandboxes {
+            border-top: solid 1px rgba(255, 255, 255, .1);
+            /*overflow: auto;*/
+            position: relative;
+          }
+
+          .command-bar__sandbox {
+            border-bottom: solid 1px black;
+            border-top: solid 1px rgba(255, 255, 255, .1);
+            padding: 8px 6px 4px;
+          }
+    
+          .command-bar__sandbox:hover,
+          .command-bar__sandbox:active,
+          .command-bar__sandbox:focus {
+            background-color: #202020;
+            color: white;
+            outline-style: none;
+            cursor: default;
+          }
+
+          .command-bar__sandbox:first-child {
+            border-top: none;
+          }
+
+          .command-bar__sandbox:last-child {
+            border-bottom: none;
+            padding-bottom: 3px;
+          }
+
+          .command-bar__title {
+            /*align-items: center;*/
+            color: rgba(255, 255, 255, .6);
+            display: flex;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            font-weight: normal;
+            justify-content: space-between;
+            margin: 0;
+            padding: 5px 0 0;
+          }
+
+          .command-bar__title ::ng-deep mark {
+            background: transparent;
+            color: #0097fb;
+            font-weight: bold;
+          }
+
+          .command-bar__name {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .command-bar__label {
+            background: rgba(255, 255, 255, .1);
+            border-radius: 2px;
+            display: block;
+            font-size: 10px;
+            margin-left: 10px;
+            padding: 4px 5px 3px;
+            text-decoration: none;
+            color: #3195bf;
+            border: solid 1px #252526;
+          }
+
+          .command-bar__label:hover,
+          .command-bar__label:active,
+          .command-bar__label:focus {
+            opacity: 0.9;
+            outline-style: none;
+            border: solid 1px #666666;
+          }
+
+          /* Scenario Groups */
+
+          .command-bar__sandbox__group {
+              padding: 3px 10px 3px 3px;
+              display: inline-block;
+          }
+
+          .command-bar__sandbox__group__title {
+              color: rgba(255, 255, 255, .4);
+              font-family: Consolas, monospace;
+              font-size: 12px;
+              margin: 0;
+          }
+
+          .command-bar__sandbox__group__title:hover,
+          .command-bar__sandbox__group__title:active,
+          .command-bar__sandbox__group__title:focus {
+              opacity: 0.8;
+              outline-style: none;
+              cursor: pointer;
+          }
+
+          .command-bar__sandbox__groups{
+              margin: 3px;
+          }
+
+          /* Scenarios */
+          .command-bar__scenarios {
+            /*
+            display: flex;
+            */
+          }
+
+          .command-bar__scenario-link {
+            align-items: center;
+            border-radius: 2px;
+            color: rgba(255, 255, 255, .5);
+            cursor: pointer;
+            display: flex;
+            padding: 4px 3px;
+            width: 100%;
+          }
+
+          .command-bar__scenario-link:hover,
+          .command-bar__scenario-link:active,
+          .command-bar__scenario-link:focus {
+            background-color: #0097fb;
+            color: white;
+            outline-style: none;
+          }
+
+          .command-bar__scenario-link:hover .command-bar__scenario-icon,
+          .command-bar__scenario-link:active .command-bar__scenario-icon,
+          .command-bar__scenario-link:focus .command-bar__scenario-icon {
+            opacity: .5;
+          }
+
+          .command-bar__scenario-label {
+            line-height: 1;
+            max-width: calc(100% - 26px);
+            min-width: calc(100% - 26px);
+            padding-bottom: 2px;
+          }
+
+          .command-bar__scenario-link--selected {
+            background: rgba(255, 255, 255, .1);
+            color: white;
+          }
+
+          .command-bar__scenario-link:hover .command-bar__scenario-icon--selected,
+          .command-bar__scenario-link:active .command-bar__scenario-icon--selected,
+          .command-bar__scenario-link:focus .command-bar__scenario-icon--selected {
+            fill: white;
+          }
+
+          /* Brand */
+          .command-bar__brand {
+            border-top: solid 1px black;
+            display: block;
+            position: relative;
+            padding: 9px 0 3px;
+            text-align: center;
+          }
+
+          .command-bar__brand::before {
+            border-bottom: solid 1px rgba(255, 255, 255, .1);
+            content: "";
+            display: block;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+          }
+
+          .command-bar__brand:hover .command-bar__logo__box {
+            fill: rgba(255, 255, 255, .2);
+          }
+
+          .command-bar__brand:hover .command-bar__logo__letter {
+            fill: rgba(255, 255, 255, .75);
+          }
+
+          /* Content */
+          .content {
+              display: flex;
+              height: 100vh;
+          }
+
+
+          .content__none {
+            /*
+            align-items: center;
+            */
+            border: 0;
+            display: flex;
+            min-height: calc(100vh - 4em);
+            justify-content: center;
+            padding-top: 2em;
+            padding-bottom: 2em;
+            position: relative;
+            width: 100%;
+          }
+
+          .content__none-message {
+            font-family: Arial, sans-serif;
+            max-width: 50%;
+            min-width: 450px;
+            text-align: center;
+          }
+
+          .content__none-message em {
+            color: #666;
+          }
+
+          .content__none-message p {
+            font-size: 20px;
+          }
+
+          .content__shortcuts {
+            border-top: solid 1px #ccc;
+            margin-top: 2em;
+            padding: 30px 0 0 100px;
+            width: 520px;
+          }
+
+          .content__shortcut {
+            display: flex;
+          }
+
+          .content__shortcut-label {
+            align-items: center;
+            display: flex;
+            font-size: 11px;
+            justify-content: flex-end;
+            max-width: 150px;
+            min-width: 150px;
+            padding: 8px 12px 8px 0;
+            white-space: nowrap;
+          }
+
+          .content__shortcut-label code {
+            background: #eee;
+            border: solid 1px #ccc;
+            border-radius: 4px;
+            padding: 3px 7px;
+          }
+
+          .content__shortcut-value {
+            align-items: center;
+            display: flex;
+            font-size: 11px;
+            line-height: 1.75;
+            text-align: left;
+            white-space: nowrap;
+          }
+    `],
+    }),
+    __param(4, Inject(MIDDLEWARE)),
+    __metadata("design:paramtypes", [StateService,
+        UrlService,
+        EventManager,
+        LevenshteinDistance,
+        Observable])
+], AppComponent);
 export { AppComponent };
 //# sourceMappingURL=app.component.js.map

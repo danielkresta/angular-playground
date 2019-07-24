@@ -1,4 +1,3 @@
-import {} from 'jest';
 import fs = require('fs');
 import chalk from 'chalk';
 import { ErrorReporter, REPORT_TYPE } from '../src/error-reporter';
@@ -7,7 +6,7 @@ describe('ErrorReporter', () => {
     const mockScenarios = [{
         url: 'http://localhost:4201/textbox',
         name: 'textbox',
-        description: 'Default'
+        description: 'Default',
     }];
     let reporter;
 
@@ -24,7 +23,7 @@ describe('ErrorReporter', () => {
         expect(reporter.errors.length).toBe(1);
         expect(reporter.errors).toEqual([{
             descriptions: 'LOG Error',
-            scenario: 'http://localhost:4201/textbox'
+            scenario: 'http://localhost:4201/textbox',
         }]);
     });
 
@@ -41,6 +40,15 @@ describe('ErrorReporter', () => {
     it('should write to file if report type is json', () => {
         const writeFileSpy = spyOn(fs, 'writeFileSync');
         reporter.type = REPORT_TYPE.JSON;
+        reporter.addError('LOG Error', 'http://localhost:4201/textbox');
+        reporter.addError('Read Error', 'http://localhost:4201/textbox');
+        reporter.compileReport();
+        expect(writeFileSpy).toHaveBeenCalled();
+    });
+
+    it('should write to file if report type is xml', () => {
+        const writeFileSpy = spyOn(fs, 'writeFileSync');
+        reporter.type = REPORT_TYPE.XML;
         reporter.addError('LOG Error', 'http://localhost:4201/textbox');
         reporter.addError('Read Error', 'http://localhost:4201/textbox');
         reporter.compileReport();

@@ -1,9 +1,12 @@
-import puppeteer = require('puppeteer');
+import * as puppeteer from 'puppeteer';
 import { resolve as resolvePath } from 'path';
 import chalk from 'chalk';
-import { copyFileSync, readFileSync, writeFileSync } from 'fs';
-import { ErrorReporter } from '../error-reporter';
+import { copyFileSync } from 'fs';
+import { ConsoleMessage } from 'puppeteer';
+import { SandboxFileInformation } from '../build-sandboxes';
+import { ErrorReporter, REPORT_TYPE } from '../error-reporter';
 import { Config } from '../configure';
+import { delay, removeDynamicImports } from '../utils';
 
 // Used to tailor the version of headless chromium ran by puppeteer
 const CHROME_ARGS = [ '--disable-gpu', '--no-sandbox' ];
@@ -16,12 +19,13 @@ export interface ScenarioSummary {
     description: string;
 }
 
-let browser: any;
+let browser: puppeteer.Browser;
 let currentScenario = '';
+let currentScenarioDescription = '';
 let reporter: ErrorReporter;
 let hostUrl = '';
 
-// Ensure Chromium instances are destroyed on err
+// Ensure Chromium instances are destroyed on error
 process.on('unhandledRejection', () => {
     if (browser) browser.close();
 });
@@ -40,7 +44,7 @@ async function main(config: Config) {
     browser = await puppeteer.launch({
         headless: true,
         handleSIGINT: false,
-        args: CHROME_ARGS
+        args: CHROME_ARGS,
     });
 
     const scenarios = getSandboxMetadata(hostUrl, config.randomScenario);
@@ -48,18 +52,19 @@ async function main(config: Config) {
     reporter = new ErrorReporter(scenarios, config.reportPath, config.reportType);
     console.log(`Retrieved ${scenarios.length} scenarios.\n`);
     for (let i = 0; i < scenarios.length; i++) {
-        console.log(`Checking: ${scenarios[i].name}: ${scenarios[i].description}`);
+        console.log(`Checking [${i + 1}/${scenarios.length}]: ${scenarios[i].name}: ${scenarios[i].description}`);
         await openScenarioInNewPage(scenarios[i], timeoutAttempts);
     }
 
     browser.close();
 
-    if (reporter.errors.length > 0) {
+    const hasErrors = reporter.errors.length > 0;
+    // always generate report if report type is a file, or if there are errors
+    if (hasErrors || config.reportType !== REPORT_TYPE.LOG) {
         reporter.compileReport();
-        process.exit(1);
-    } else {
-        process.exit(0);
     }
+    const exitCode = hasErrors ? 1 : 0;
+    process.exit(exitCode);
 }
 
 /**
@@ -74,11 +79,13 @@ async function openScenarioInNewPage(scenario: ScenarioSummary, timeoutAttempts:
     }
 
     const page = await browser.newPage();
-    page.on('console', (msg: any) => onConsoleErr(msg));
+    page.on('console', (msg: ConsoleMessage) => onConsoleErr(msg));
     currentScenario = scenario.name;
+    currentScenarioDescription = scenario.description;
 
     try {
         await page.goto(scenario.url);
+        setTimeout(() => page.close(), 10000); // close page after 10s to prevent memory leak
     } catch (e) {
         await page.close();
         await delay(1000);
@@ -94,20 +101,20 @@ async function openScenarioInNewPage(scenario: ScenarioSummary, timeoutAttempts:
 function getSandboxMetadata(baseUrl: string, selectRandomScenario: boolean): ScenarioSummary[] {
     const scenarios: ScenarioSummary[] = [];
 
-    loadSandboxMenuItems().forEach((scenario: any) => {
+    loadSandboxMenuItems().forEach((scenario: SandboxFileInformation) => {
         if (selectRandomScenario) {
             const randomItemKey = getRandomKey(scenario.scenarioMenuItems.length);
-            scenario.scenarioMenuItems
-                .forEach((item: any) => {
-                    if (item.key === randomItemKey) {
-                        const url = `${baseUrl}?scenario=${encodeURIComponent(scenario.key)}/${encodeURIComponent(item.description)}`;
-                        scenarios.push({ url, name: scenario.key, description: item.description });
-                    }
-                });
+            for (const item of scenario.scenarioMenuItems) {
+                if (item.key === randomItemKey) {
+                    const url = `${baseUrl}?scenario=${encodeURIComponent(scenario.key)}/${encodeURIComponent(item.description)}`;
+                    scenarios.push({ url, name: scenario.key, description: item.description });
+                    break;
+                }
+            }
         } else {
             // Grab all scenarios
             scenario.scenarioMenuItems
-                .forEach((item: any) => {
+                .forEach((item) => {
                     const url = `${baseUrl}?scenario=${encodeURIComponent(scenario.key)}/${encodeURIComponent(item.description)}`;
                     scenarios.push({ url, name: scenario.key, description: item.description });
                 });
@@ -120,7 +127,7 @@ function getSandboxMetadata(baseUrl: string, selectRandomScenario: boolean): Sce
 /**
  * Attempt to load sandboxes.ts and provide menu items
  */
-function loadSandboxMenuItems(): any[] {
+function loadSandboxMenuItems(): SandboxFileInformation[] {
     try {
         return require(SANDBOX_DEST).getSandboxMenuItems();
     } catch (err) {
@@ -131,38 +138,27 @@ function loadSandboxMenuItems(): any[] {
 /**
  * Callback when Chromium page encounters a console error
  */
-async function onConsoleErr(msg: any) {
-    if (msg.type === 'error') {
-        console.error(chalk.red(`Error in ${currentScenario}:`));
-        const descriptions = msg.args
-            .map(a => a._remoteObject)
-            .filter(o => o.type === 'object')
-            .map(o => o.description);
-        descriptions.map(d => console.error(d));
-        reporter.addError(descriptions, currentScenario);
+function onConsoleErr(msg: ConsoleMessage) {
+    if (msg.type() === 'error') {
+        console.error(chalk.red(`Error in ${currentScenario} (${currentScenarioDescription}):`));
+        const getErrors = (type: string, getValue: (_: any) => string) => msg.args()
+            .map(a => (a as any)._remoteObject)
+            .filter(o => o.type === type)
+            .map(getValue);
+        const stackTrace = getErrors('object', o => o.description);
+        const errorMessage = getErrors('string', o => o.value);
+        const description = stackTrace.length ? stackTrace : errorMessage;
+        description.map(d => console.error(d));
+        if (description.length) {
+            reporter.addError(description, currentScenario, currentScenarioDescription);
+        }
     }
 }
 
 /**
- * Returns a random value between 1 and the provided length.
+ * Returns a random value between 1 and the provided length (both inclusive).
  * Note: indexing of keys starts at 1, not 0
  */
 function getRandomKey(menuItemsLength: number): number {
-    return Math.floor(Math.random() * (menuItemsLength - 1) + 1);
-}
-
-function removeDynamicImports(sandboxPath: string) {
-    const data = readFileSync(sandboxPath, 'utf-8');
-    const dataArray = data.split('\n');
-    const getSandboxIndex = dataArray.findIndex(val => val.includes('getSandbox(path)'));
-    const result = dataArray.slice(0, getSandboxIndex).join('\n');
-    writeFileSync(sandboxPath, result, { encoding: 'utf-8' });
-}
-
-function delay(ms: number) {
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve();
-        }, ms);
-    });
+    return Math.floor(Math.random() * menuItemsLength) + 1;
 }

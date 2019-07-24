@@ -18,7 +18,7 @@ class JSONReporter {
         this.errors = errors;
         this.scenarioNames = scenarioNames;
     }
-    getJson() {
+    getReport() {
         return JSON.stringify({
             stats: new JSONStats(this.scenarioNames.length, this.errors.length),
             failures: this.errors.map(failure => {
@@ -27,14 +27,14 @@ class JSONReporter {
                 return {
                     title: failure.scenario,
                     err: {
-                        message: failure.descriptions[0]
-                    }
+                        message: failure.descriptions[0],
+                    },
                 };
             }),
             passes: this.scenarioNames.map(pass => {
                 return { title: pass };
             }),
-            skips: []
+            skips: [],
         }, null, 2);
     }
 }

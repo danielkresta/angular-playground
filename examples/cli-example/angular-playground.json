@@ -1,6 +1,13 @@
 {
-    "sourceRoot": "src",
+    "sourceRoots": ["./src"],
     "angularCli": {
         "appName": "playground"
+    },
+    "imageSnapshotConfig": {
+        "customDiffConfig": {
+            "threshold": 0.1
+        },
+        "diffDirection": "vertical",
+        "noColors": true
     }
 }

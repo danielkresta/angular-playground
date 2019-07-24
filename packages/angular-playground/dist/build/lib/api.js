@@ -1,20 +1,16 @@
-export function sandboxOf(type, config) {
-    return new SandboxBuilder(type, config);
-}
-var SandboxBuilder = /** @class */ (function () {
-    function SandboxBuilder(_type, _config) {
-        if (_config === void 0) { _config = {}; }
+export class SandboxBuilder {
+    constructor(_type, _config = {}) {
         this._type = _type;
         this._config = _config;
         this._scenarios = [];
         this._scenarioCounter = 0;
     }
-    SandboxBuilder.prototype.add = function (description, config) {
-        var key = ++this._scenarioCounter;
-        this._scenarios.push(Object.assign({}, config, { key: key }));
+    add(description, config) {
+        let key = ++this._scenarioCounter;
+        this._scenarios.push(Object.assign({}, config, { key }));
         return this;
-    };
-    SandboxBuilder.prototype.serialize = function (sandboxPath) {
+    }
+    serialize(sandboxPath) {
         return {
             key: sandboxPath,
             type: this._type,
@@ -26,8 +22,9 @@ var SandboxBuilder = /** @class */ (function () {
             schemas: this._config.schemas || [],
             declareComponent: this._config.declareComponent !== undefined ? this._config.declareComponent : true,
         };
-    };
-    return SandboxBuilder;
-}());
-export { SandboxBuilder };
+    }
+}
+export function sandboxOf(type, config) {
+    return new SandboxBuilder(type, config);
+}
 //# sourceMappingURL=api.js.map

@@ -1,24 +1,21 @@
-var StateService = /** @class */ (function () {
-    function StateService() {
-        var _this = this;
+export class StateService {
+    constructor() {
         this.filterKey = 'angularPlayground.filter';
         this.filter = sessionStorage.getItem(this.filterKey);
         sessionStorage.removeItem(this.filterKey);
-        var beforeUnload = function () {
-            sessionStorage.setItem(_this.filterKey, emptyStringIfNull(_this.filter));
+        const beforeUnload = () => {
+            sessionStorage.setItem(this.filterKey, emptyStringIfNull(this.filter));
             return 'unload';
         };
         window.addEventListener('beforeunload', beforeUnload);
     }
-    StateService.prototype.getFilter = function () {
+    getFilter() {
         return this.filter;
-    };
-    StateService.prototype.setFilter = function (value) {
+    }
+    setFilter(value) {
         this.filter = value;
-    };
-    return StateService;
-}());
-export { StateService };
+    }
+}
 function emptyStringIfNull(value) {
     return value ? value : '';
 }
