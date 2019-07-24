@@ -1,10 +1,8 @@
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -13,35 +11,32 @@ import { PlaygroundCommonModule } from './playground-common.module';
 import { MIDDLEWARE } from '../lib/middlewares';
 import { initializePlayground } from '../lib/initialize-playground';
 import { BehaviorSubject } from 'rxjs';
-var _middleware = new BehaviorSubject({
+const _middleware = new BehaviorSubject({
     selector: null,
     overlay: false,
-    modules: []
+    modules: [],
 });
-var middleware = _middleware.asObservable();
-var ɵ0 = middleware;
-var PlaygroundModule = /** @class */ (function () {
-    function PlaygroundModule() {
-    }
-    PlaygroundModule.configure = function (configuration) {
+const middleware = _middleware.asObservable();
+const ɵ0 = middleware;
+let PlaygroundModule = class PlaygroundModule {
+    static configure(configuration) {
         initializePlayground(configuration.selector);
-        _middleware.next(__assign({}, _middleware.value, configuration));
+        _middleware.next(Object.assign({}, _middleware.value, configuration));
         return this;
-    };
-    PlaygroundModule.decorators = [
-        { type: NgModule, args: [{
-                    imports: [
-                        BrowserModule,
-                        PlaygroundCommonModule
-                    ],
-                    providers: [
-                        { provide: MIDDLEWARE, useValue: ɵ0 }
-                    ],
-                    bootstrap: [AppComponent]
-                },] },
-    ];
-    return PlaygroundModule;
-}());
+    }
+};
+PlaygroundModule = __decorate([
+    NgModule({
+        imports: [
+            BrowserModule,
+            PlaygroundCommonModule,
+        ],
+        providers: [
+            { provide: MIDDLEWARE, useValue: ɵ0 },
+        ],
+        bootstrap: [AppComponent],
+    })
+], PlaygroundModule);
 export { PlaygroundModule };
 export { ɵ0 };
 //# sourceMappingURL=playground.module.js.map

@@ -2,30 +2,42 @@ import chalk from 'chalk';
 import { writeFileSync } from 'fs';
 import { ScenarioSummary } from './check-errors/verify-sandboxes';
 import { JSONReporter } from './check-errors/reporters/json-reporter';
+import { XMLReporter } from './check-errors/reporters/xml-reporter';
 
 export const REPORT_TYPE = {
     LOG: 'log',
-    JSON: 'json'
+    JSON: 'json',
+    XML: 'xml',
 };
 
+export interface Reporter {
+    getReport: () => string;
+}
+
+export interface ErrorReport {
+    descriptions: any;
+    scenario: string;
+    scenarioTitle: string;
+}
+
 export class ErrorReporter {
-    private _errors: { descriptions: any, scenario: string }[] = [];
+    private _errors: ErrorReport[] = [];
 
     constructor(
         public scenarios: ScenarioSummary[],
         public filename: string,
-        public type: string
-    ) {}
+        public type: string) {}
 
     get errors() {
         return this._errors;
     }
 
-    addError(descriptions: any, scenario: string) {
-        this._errors.push({ descriptions, scenario });
+    addError(descriptions: any, scenario: string, scenarioTitle: string) {
+        this._errors.push({ descriptions, scenario, scenarioTitle });
     }
 
     compileReport() {
+        let reporter: Reporter;
         switch (this.type) {
             case REPORT_TYPE.LOG:
                 console.error(chalk.red('Error in the following scenarios'));
@@ -36,10 +48,13 @@ export class ErrorReporter {
                 break;
             case REPORT_TYPE.JSON:
                 const scenarioNames = this.scenarios.map(s => `${s.name}: ${s.description}`);
-                const results = new JSONReporter(this.errors, scenarioNames);
-                writeFileSync(this.filename, results.getJson());
+                reporter = new JSONReporter(this.errors, scenarioNames);
+                writeFileSync(this.filename, reporter.getReport());
+                break;
+            case REPORT_TYPE.XML:
+                reporter = new XMLReporter(this.errors, this.scenarios);
+                writeFileSync(this.filename, reporter.getReport());
                 break;
         }
     }
-
 }

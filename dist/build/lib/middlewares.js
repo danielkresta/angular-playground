@@ -1,3 +1,3 @@
 import { InjectionToken } from '@angular/core';
-export var MIDDLEWARE = new InjectionToken('middleware');
+export const MIDDLEWARE = new InjectionToken('middleware');
 //# sourceMappingURL=middlewares.js.map

@@ -14,7 +14,6 @@ export interface ScenarioConfig {
     context?: any;
     providers?: any[];
 }
-export declare function sandboxOf(type: any, config?: SandboxOfConfig): SandboxBuilder;
 export declare class SandboxBuilder {
     private _type;
     private _config;
@@ -24,3 +23,4 @@ export declare class SandboxBuilder {
     add(description: string, config: ScenarioConfig): this;
     serialize(sandboxPath: string): Sandbox;
 }
+export declare function sandboxOf(type: any, config?: SandboxOfConfig): SandboxBuilder;

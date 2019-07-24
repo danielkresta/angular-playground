@@ -1,33 +1,34 @@
+import * as getPort from 'get-port';
 import { configure, Config } from './configure';
 import { buildSandboxes } from './build-sandboxes';
 import { startWatch } from './start-watch';
 import { verifySandboxes } from './check-errors/verify-sandboxes';
-import { findFirstFreePort } from './check-errors/find-port';
 import { serveAngularCli } from './serve-angular-cli';
 import { buildAngularCli } from './build-angular-cli';
+import { checkSnapshots } from './check-snapshots';
 
 export async function run() {
     const config: Config = configure(process.argv);
 
     try {
-        await buildSandboxes(config.sourceRoot, config.chunk);
+        await buildSandboxes(config.sourceRoots, config.chunk);
     } catch (err) {
         throw err;
     }
 
     if (config.buildWithServiceWorkers) {
-        return await buildAngularCli(config.angularAppName, config.baseHref);
+        return await buildAngularCli(config.angularAppName, config.baseHref, config.angularCliMaxBuffer);
     }
 
-    if (config.verifySandboxes) {
-        config.angularCliPort = await findFirstFreePort('127.0.0.1', 7000, 9000);
+    if (config.verifySandboxes || (config.checkVisualRegressions && !config.deleteSnapshots)) {
+        config.angularCliPort = await getPort({ host: config.angularCliHost });
     }
 
-    if (config.watch || config.verifySandboxes) {
-        startWatch(config.sourceRoot, () => buildSandboxes(config.sourceRoot, config.chunk));
+    if ((config.watch && !config.deleteSnapshots) || config.verifySandboxes || (config.checkVisualRegressions && !config.deleteSnapshots)) {
+        startWatch(config.sourceRoots, () => buildSandboxes(config.sourceRoots, config.chunk));
     }
 
-    if (config.serve || config.verifySandboxes) {
+    if ((config.serve && !config.deleteSnapshots) || config.verifySandboxes || (config.checkVisualRegressions && !config.deleteSnapshots)) {
         try {
             await serveAngularCli(config);
         } catch (err) {
@@ -42,4 +43,12 @@ export async function run() {
             throw err;
         }
     }
+
+    if (config.checkVisualRegressions) {
+      try {
+          await checkSnapshots(config);
+      } catch (err) {
+          throw err;
+      }
+  }
 }

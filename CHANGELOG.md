@@ -1,3 +1,177 @@
+# 6.0.1 (2019-7-18)
+
+<a name="6.0.1"></a>
+
+### Bug Fixes
+* **schematic:** Fix issue ([#199](https://github.com/SoCreate/angular-playground/issues/199)) with `ng add` setting improper `tsconfig.app.json` path after upgrade to Angular version 8.  
+
+# 6.0.0 (2019-7-3)
+
+<a name="6.0.0"></a>
+
+### Features
+* **visual regressions:** Add ability to delete snapshots based on sandboxes filtered
+
+### Bug Fixes
+* **visual regressions:** Fix with special characters causing issue with naming snapshots
+
+### Breaking Changes
+* **visual regressions command line switch change from "--update-snapshots-directory" to "--path-to-sandboxes"**:
+
+Before:
+
+ ```
+  angular-playground --config angular-playground.json --check-visual-regressions --update-snapshots --update-snapshots-directory app/feature1
+ ```
+After:
+
+```
+  angular-playground --config angular-playground.json --check-visual-regressions --update-snapshots --path-to-sandboxes app/feature1
+```
+
+# 5.8.4 (2019-6-27)
+
+<a name="5.8.4"></a>
+
+### Bug Fixes
+* **visual regressions:** Fix issue with screenshot image name not being unique
+
+# 5.8.3 (2019-6-19)
+
+<a name="5.8.3"></a>
+
+### Bug Fixes
+* **visual regressions:** Fix issue with screenshot capturing loading image
+* **visual regressions:** Fix issue with some tests timing out
+
+# 5.8.2 (2019-6-15)
+
+<a name="5.8.2"></a>
+
+### Bug Fixes
+* **visual regressions:** Make jest not ignore the `test.js` file used for testing visual regressions
+
+# 5.8.1 (2019-6-14)
+
+<a name="5.8.1"></a>
+
+### Bug Fixes
+* **visual regressions:** Include jest config files needed for testing visual regressions
+
+# 5.8.0 (2019-6-14)
+
+<a name="5.8.0"></a>
+
+### Features
+* **config:** Add option to check for visual regressions
+
+# 5.7.0 (2019-6-5)
+
+<a name="5.7.0"></a>
+
+### Features
+* **config:** Add option to configure host that ng serve runs on (default is 127.0.0.1)
+
+### Bug Fixes
+* **config:** Add default file path for check errors output file (only for json/xml, not log)
+
+# 5.6.0 (2019-6-5)
+
+<a name="5.6.0"></a>
+
+### Features
+* **angular:** Upgrade to be compatible with Angular version 8
+
+### Bug Fixes
+* **error reporter:** Fixed error reporter sometimes having blank errors
+
+# 5.5.0 (2019-5-10)
+
+<a name="5.5.0"></a>
+
+### Features
+* **config:** Playground now supports using multiple source libraries at once (via the `sourceRoots` property in the configuration)
+
+# 5.4.4 (2019-5-10)
+
+<a name="5.4.4"></a>
+
+### Bug Fixes
+* **cli schematics:** Fixed schematic pathing issues for apps not created with the default `ng new <appName>` command
+
+# 5.4.3 (2019-4-5)
+
+<a name="5.4.3"></a>
+
+### Bug Fixes
+* **error reporter:** Fixed finding a free port
+
+# 5.4.2 (2019-4-2)
+
+<a name="5.4.2"></a>
+
+### Bug Fixes
+* **error reporter:** Fixed not xml encoding some strings for the xml report
+
+# 5.4.1 (2019-4-1)
+
+<a name="5.4.1"></a>
+
+### Bug Fixes
+* **error reporter:** Fixed not generating a report when there were no errors
+
+# 5.4.0 (2019-3-19)
+
+<a name="5.4.0"></a>
+
+### Features
+* **error reporter:** Added a new error reporter for JUnit XML format
+
+# 5.3.1 (2019-3-18)
+
+<a name="5.3.1"></a>
+
+### Features
+* **perf:** Performance optimizations to verify sandboxes
+
+### Bug Fixes
+* **cli:** Fixed CLI configuration options for verify sandboxes
+* **types:** Improved types for verify sandboxes
+
+# 5.3.0 (2019-1-18)
+
+<a name="5.3.0"></a>
+
+### Features
+* **npm dependencies:** Update npm dependencies and peer dependencies
+
+# 5.2.0 (2018-11-15)
+
+### Features
+* **configuration:** Users can now set the max buffer size for the internal angular cli commands
+
+### Kudos
+* Thanks to **@paolocarrasco** for the contributions towards this release!
+
+# 5.1.5 (2018-10-18)
+
+<a name="5.1.5"></a>
+
+### Bug Fixes
+* **ng add:** Fix ng add schematic error caused styles in the angular.json file using the new [object format](https://github.com/angular/angular-cli/wiki/stories-global-styles#global-styles).
+
+# 5.1.4 (2018-10-17)
+
+<a name="5.1.4"></a>
+
+### Bug Fixes
+* **ng add:** Fix ng add schematic adding 2 entries to the package.json file.
+* **ng add:** Fix incorrect assets path when creating playground entry in angular.json.
+* **playground:** Improved message on playground home screen when there are no sandboxed components.
+
+### Kudos
+* Thanks to **@Halt001** for the contributions towards this release!
+
 # 5.1.3 (2018-08-23)
 
 <a name="5.1.3"></a>

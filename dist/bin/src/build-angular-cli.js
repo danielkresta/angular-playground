@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = require("child_process");
-function buildAngularCli(appName, baseHref) {
+function buildAngularCli(appName, baseHref, maxBuffer) {
     return __awaiter(this, void 0, void 0, function* () {
         let isInstalled = yield serviceWorkerIsInstalled();
         if (!isInstalled) {
@@ -18,8 +18,9 @@ function buildAngularCli(appName, baseHref) {
                 'see docs: https://github.com/angular/angular-cli/wiki/build#service-worker\n\n');
         }
         console.log('Building for production with sandboxes...');
+        const options = Number.isInteger(+maxBuffer) ? { maxBuffer: +maxBuffer } : {};
         // Cannot build w/ AOT due to runtime compiler dependency
-        child_process_1.exec(`ng build ${appName} --prod --aot=false --base-href=${baseHref}`, (err, stdout, stderr) => {
+        child_process_1.exec(`ng build ${appName} --prod --aot=false --base-href=${baseHref}`, options, (err, stdout, stderr) => {
             if (err)
                 throw err;
             console.log(stdout);
