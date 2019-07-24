@@ -1,31 +1,32 @@
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
 import { Pipe } from '@angular/core';
-let HighlightSearchMatchPipe = class HighlightSearchMatchPipe {
-    transform(value, indexMatches, offset = 0) {
+var HighlightSearchMatchPipe = /** @class */ (function () {
+    function HighlightSearchMatchPipe() {
+    }
+    HighlightSearchMatchPipe.prototype.transform = function (value, indexMatches, offset) {
+        if (offset === void 0) { offset = 0; }
         // Match null and undefined, but not 0 or ''
         if (value == null || indexMatches == null) {
             return value;
         }
-        let transformedValue = '';
-        let indexes = indexMatches.reduce((a, n) => n >= offset ? [...a, n - offset] : a, []);
-        for (let i = 0; i < value.length; i++) {
-            if (indexes.some(item => item === i)) {
-                transformedValue += `<mark>${value[i]}</mark>`;
+        var transformedValue = '';
+        var indexes = indexMatches.reduce(function (a, n) { return n >= offset ? a.concat([n - offset]) : a; }, []);
+        var _loop_1 = function (i) {
+            if (indexes.some(function (item) { return item === i; })) {
+                transformedValue += "<mark>" + value[i] + "</mark>";
             }
             else {
                 transformedValue += value[i];
             }
+        };
+        for (var i = 0; i < value.length; i++) {
+            _loop_1(i);
         }
         return transformedValue;
-    }
-};
-HighlightSearchMatchPipe = __decorate([
-    Pipe({ name: 'apHighlightSearchMatch', pure: false })
-], HighlightSearchMatchPipe);
+    };
+    HighlightSearchMatchPipe.decorators = [
+        { type: Pipe, args: [{ name: 'apHighlightSearchMatch', pure: false },] },
+    ];
+    return HighlightSearchMatchPipe;
+}());
 export { HighlightSearchMatchPipe };
 //# sourceMappingURL=highlight-search-match.pipe.js.map

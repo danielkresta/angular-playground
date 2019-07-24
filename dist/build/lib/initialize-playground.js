@@ -1,23 +1,11 @@
-export const initializePlayground = (elementNameToReplace) => {
+export var initializePlayground = function (elementNameToReplace) {
     document.getElementsByTagName('title')[0].innerHTML = 'Playground';
     if (elementNameToReplace && elementNameToReplace.length > 0) {
-        let appNode = document.getElementsByTagName(elementNameToReplace)[0];
-        if (!appNode) {
-            throw new Error(`Your configured selector (${elementNameToReplace}) does not match your app root selector.`);
-        }
+        var appNode = document.getElementsByTagName(elementNameToReplace)[0];
         appNode.parentNode.replaceChild(document.createElement('ap-root'), appNode);
     }
-    let resetStyles = `
-    // Playground reset styles
-    html {
-      -ms-text-size-adjust: 100%;
-      -webkit-text-size-adjust: 100%;
-    }
-    body {
-      margin: 0;
-    }
-  `;
-    let style = document.createElement('style');
+    var resetStyles = "\n    // Playground reset styles\n    html {\n      -ms-text-size-adjust: 100%;\n      -webkit-text-size-adjust: 100%;\n    }\n    body {\n      margin: 0;\n    }\n  ";
+    var style = document.createElement('style');
     style.type = 'text/css';
     style.appendChild(document.createTextNode(resetStyles));
     document.head.insertBefore(style, document.head.firstChild);
